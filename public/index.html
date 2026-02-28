@@ -158,6 +158,13 @@
         .chat-tt::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--ac);
             box-shadow:0 0 8px var(--ac);animation:pulse 2s infinite;flex-shrink:0}
         .chat-hd-btns{display:flex;gap:6px;align-items:center}
+        /* AI先生ひとこと（ヘッダー常時表示） */
+        .chat-status{flex:1;font-size:11px;color:var(--mid);font-family:var(--fb);
+            overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+            padding:0 6px;opacity:0;transition:opacity .4s;font-style:italic}
+        .chat-status.show{opacity:1}
+        .chat-status.ok{color:#0a7a4a}
+        .chat-status.ng{color:#c0392b}
         .chat-setting-btn{height:26px;padding:0 9px;border-radius:13px;background:var(--ft);border:1.5px solid var(--ln);
             font-size:10px;font-weight:600;color:var(--mid);cursor:pointer;display:flex;align-items:center;gap:3px;transition:all .15s;white-space:nowrap}
         .chat-setting-btn:hover,.chat-setting-btn.open{border-color:var(--ac);color:var(--ac);background:var(--ac-bg)}
@@ -371,6 +378,7 @@
     <!-- ヘッダー -->
     <div class="chat-hd">
         <div class="chat-tt">✨ AI先生</div>
+        <div class="chat-status" id="chatStatus"></div>
         <div class="chat-hd-btns">
             <button class="chat-setting-btn" id="chatSettingBtn">⚙️ 設定</button>
         </div>
