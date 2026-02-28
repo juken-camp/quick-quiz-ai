@@ -447,56 +447,88 @@ function formatBubbleText(text) {
 }
 
 // ---- 浮遊バブル表示 ----
-let activeBubbles = []; // 無制限モードで生きているバブルを管理
+let activeBubbles = []; // 表示中バブルを管理（重なり防止）
+
+function removeBubble(el, fade = false) {
+    el.style.pointerEvents = 'none';
+    el.removeEventListener('click', el._dismiss);
+    el.removeEventListener('touchend', el._touchDismiss);
+    const idx = activeBubbles.indexOf(el);
+    if (idx > -1) activeBubbles.splice(idx, 1);
+    if (fade) {
+        el.style.transition = 'opacity .35s ease, transform .35s ease';
+        el.style.opacity = '0';
+        el.style.transform = 'scale(.94)';
+        setTimeout(() => { if (el.parentNode) el.remove(); }, 360);
+    } else {
+        if (el.parentNode) el.remove();
+    }
+    // 残ったバブルの位置を詰める
+    repositionBubbles();
+}
+
+function repositionBubbles() {
+    // 下から積み上げ：各バブルの高さを測って隙間なく並べる
+    const BASE = 100; // ai-bar + チップの上
+    const GAP = 8;
+    let nextBottom = BASE;
+    // 古い順（配列の先頭が最初に出たもの）から上に積む
+    activeBubbles.forEach(b => {
+        b.style.transition = 'bottom .25s cubic-bezier(.22,1,.36,1)';
+        b.style.bottom = nextBottom + 'px';
+        nextBottom += b.offsetHeight + GAP;
+    });
+}
 
 function spawnBubble(text, type = 'ai') {
     const isInfinite = document.getElementById('bubbleInfinite')?.checked;
 
-    // 無制限モードの場合、既存バブルを半透明にフェード
     if (isInfinite) {
+        // 無制限：古いバブルを半透明に
         activeBubbles.forEach(b => {
             b.style.transition = 'opacity .4s';
-            b.style.opacity = '0.25';
-        });
-        // 完全に透過したら削除
-        activeBubbles.forEach(b => {
-            setTimeout(() => { if (b.parentNode) b.remove(); }, 3000);
+            b.style.opacity = '0.2';
+            setTimeout(() => { if (b.parentNode) b.remove(); }, 4000);
         });
         activeBubbles = [];
+    } else {
+        // 通常：古いバブルが残っていたら消す（重なり防止）
+        while (activeBubbles.length > 2) {
+            const old = activeBubbles.shift();
+            removeBubble(old, true);
+        }
     }
 
     const el = document.createElement('div');
     el.className = `float-bubble ${type}`;
     el.innerHTML = type === 'user' ? text : formatBubbleText(text);
-    el.style.bottom = '100px';
+    // 既存バブルの上に積む
+    const BASE = 100;
+    const GAP = 8;
+    let startBottom = BASE;
+    activeBubbles.forEach(b => { startBottom += (b.offsetHeight || 60) + GAP; });
+    el.style.bottom = startBottom + 'px';
     el.style.pointerEvents = 'auto';
     el.style.cursor = 'pointer';
     document.body.appendChild(el);
+    activeBubbles.push(el);
 
-    // クリック／タップで即消去（ポップ！）
+    // タップで消去（効果音 + フェードアウト）
     function dismissBubble() {
-        // 二重発火防止
-        el.removeEventListener('click', dismissBubble);
-        el.removeEventListener('touchend', touchDismiss);
-        // パン！効果音
         sfx.pop();
-        // ポップアニメ
-        el.style.animation = 'bubblePop .32s cubic-bezier(.22,1,.36,1) forwards';
-        el.style.pointerEvents = 'none';
-        setTimeout(() => { if (el.parentNode) el.remove(); }, 320);
-        const idx = activeBubbles.indexOf(el);
-        if (idx > -1) activeBubbles.splice(idx, 1);
+        removeBubble(el, true);
     }
     function touchDismiss(e) { e.preventDefault(); dismissBubble(); }
+    el._dismiss = dismissBubble;
+    el._touchDismiss = touchDismiss;
     el.addEventListener('click', dismissBubble);
     el.addEventListener('touchend', touchDismiss);
 
     if (isInfinite) {
-        // 無制限：アニメ後に消えないよう固定表示
         el.style.animation = 'bubbleIn .3s cubic-bezier(.22,1,.36,1) forwards';
-        activeBubbles.push(el);
     } else {
-        el.addEventListener('animationend', () => { if (el.parentNode) el.remove(); });
+        // 時間が来たら自動フェードアウト
+        el.addEventListener('animationend', () => removeBubble(el, true));
     }
 }
 
