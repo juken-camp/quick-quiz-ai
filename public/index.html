@@ -21,84 +21,84 @@
         body{font-family:var(--fb);background:#f7f7fb;color:var(--bk);min-height:100vh;
             -webkit-user-select:none;user-select:none;touch-action:manipulation;overflow-x:hidden}
 
-        .shell{max-width:480px;margin:0 auto;padding:0 20px;min-height:100vh}
-        .header{padding:40px 0 12px;position:relative}
-        .header-logo{font-family:var(--fd);font-weight:800;font-size:32px;letter-spacing:-.04em;line-height:1;display:flex;align-items:center;gap:10px}
+        .shell{max-width:480px;margin:0 auto;padding:0 18px;min-height:100vh}
+        .header{padding:24px 0 8px;position:relative}
+        .header-logo{font-family:var(--fd);font-weight:800;font-size:26px;letter-spacing:-.04em;line-height:1;display:flex;align-items:center;gap:8px}
         .header-logo .ai{display:inline-flex;align-items:center;justify-content:center;
             background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--wh);
-            font-size:10px;font-weight:700;letter-spacing:.12em;padding:4px 10px;border-radius:6px;
+            font-size:9px;font-weight:700;letter-spacing:.12em;padding:3px 8px;border-radius:5px;
             box-shadow:var(--glow);position:relative;top:-1px}
-        .header-sub{font-family:var(--fm);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--soft);margin-top:8px}
-        .header-line{width:100%;height:1px;background:linear-gradient(90deg,var(--ac) 0%,var(--ln) 60%);margin-top:18px;opacity:.6}
+        .header-sub{font-family:var(--fm);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--soft);margin-top:5px}
+        .header-line{width:100%;height:1px;background:linear-gradient(90deg,var(--ac) 0%,var(--ln) 60%);margin-top:12px;opacity:.6}
 
         .screen{animation:si .4s cubic-bezier(.22,1,.36,1)}
         @keyframes si{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
         .hidden{display:none!important}
 
-        .label{font-family:var(--fm);font-size:10px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--soft);margin-bottom:16px}
-        .label-lg{font-family:var(--fd);font-size:20px;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
-        .label-desc{font-size:13px;color:var(--mid);line-height:1.5;margin-bottom:20px}
+        .label{font-family:var(--fm);font-size:10px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--soft);margin-bottom:10px}
+        .label-lg{font-family:var(--fd);font-size:18px;font-weight:700;letter-spacing:-.02em;margin-bottom:4px}
+        .label-desc{font-size:12px;color:var(--mid);line-height:1.5;margin-bottom:14px}
 
         /* Subject list */
-        .subj-grid{display:flex;flex-direction:column}
-        .subj-item{display:flex;align-items:center;gap:16px;padding:18px 16px;margin-bottom:8px;
-            border-radius:16px;background:var(--wh);box-shadow:var(--shadow-sm);
+        .subj-grid{display:flex;flex-direction:column;gap:6px}
+        .subj-item{display:flex;align-items:center;gap:12px;padding:12px 14px;
+            border-radius:12px;background:var(--wh);box-shadow:var(--shadow-sm);
             border:1.5px solid transparent;
             cursor:pointer;transition:all .2s cubic-bezier(.22,1,.36,1);
             width:100%;text-align:left;font-family:var(--fb);color:var(--bk)}
-        .subj-item:hover{border-color:var(--ac);box-shadow:var(--glow),var(--shadow-md);transform:translateY(-2px)}
+        .subj-item:hover{border-color:var(--ac);box-shadow:var(--glow),var(--shadow-md);transform:translateY(-1px)}
         .subj-item:active{transform:translateY(0);opacity:.85}
-        .subj-icon{width:48px;height:48px;border-radius:12px;
+        .subj-icon{width:38px;height:38px;border-radius:10px;
             background:linear-gradient(135deg,var(--ac-bg),var(--ft));
-            display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;transition:all .2s}
+            display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;transition:all .2s}
         .subj-item:hover .subj-icon{background:linear-gradient(135deg,var(--ac),var(--ac2))}
         .subj-item:hover .subj-icon span{filter:brightness(10) saturate(0)}
-        .subj-text{font-weight:600;font-size:16px;letter-spacing:-.01em}
-        .subj-arrow{margin-left:auto;font-size:18px;color:var(--soft);transition:all .2s}
-        .subj-item:hover .subj-arrow{transform:translateX(4px);color:var(--ac)}
+        .subj-text{font-weight:600;font-size:14px;letter-spacing:-.01em}
+        .subj-arrow{margin-left:auto;font-size:14px;color:var(--soft);transition:all .2s}
+        .subj-item:hover .subj-arrow{transform:translateX(3px);color:var(--ac)}
 
         /* Overlay */
         .overlay{display:none;position:fixed;inset:0;background:rgba(247,247,251,.96);backdrop-filter:blur(24px);
             -webkit-backdrop-filter:blur(24px);z-index:100;overflow-y:auto}
         .overlay.show{display:block;animation:fi .2s ease}
         @keyframes fi{from{opacity:0}to{opacity:1}}
-        .overlay-inner{max-width:480px;margin:0 auto;padding:40px 20px 60px;animation:su .3s cubic-bezier(.22,1,.36,1)}
+        .overlay-inner{max-width:480px;margin:0 auto;padding:28px 18px 80px;animation:su .3s cubic-bezier(.22,1,.36,1)}
         @keyframes su{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
         /* Category list */
-        .cat-list{display:flex;flex-direction:column}
-        .cat-item{display:flex;align-items:center;padding:13px 12px;margin-bottom:4px;border-radius:10px;
+        .cat-list{display:flex;flex-direction:column;gap:3px}
+        .cat-item{display:flex;align-items:center;padding:10px 11px;border-radius:9px;
             border:1.5px solid transparent;background:var(--wh);
-            cursor:pointer;font-family:var(--fb);font-size:14px;font-weight:500;color:var(--dk);transition:all .15s}
+            cursor:pointer;font-family:var(--fb);font-size:13px;font-weight:500;color:var(--dk);transition:all .15s}
         .cat-item:hover{background:var(--ac-bg);border-color:var(--ac2)}
-        .cat-item::before{content:'';width:18px;height:18px;border:2px solid var(--ln);border-radius:5px;
-            margin-right:14px;flex-shrink:0;transition:all .15s}
+        .cat-item::before{content:'';width:16px;height:16px;border:2px solid var(--ln);border-radius:4px;
+            margin-right:11px;flex-shrink:0;transition:all .15s}
         .cat-item.active::before{background:var(--ac);border-color:var(--ac);box-shadow:inset 0 0 0 2px var(--wh)}
         .cat-item.active{color:var(--bk);font-weight:600;background:var(--ac-bg);border-color:var(--ac2)}
-        .grade-div{font-family:var(--fm);font-size:9px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--soft);padding:18px 0 6px}
+        .grade-div{font-family:var(--fm);font-size:9px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--soft);padding:12px 0 4px}
 
         /* Buttons */
-        .btn{font-family:var(--fd);font-weight:700;font-size:14px;letter-spacing:.02em;padding:14px 32px;border:none;border-radius:12px;cursor:pointer;transition:all .2s}
+        .btn{font-family:var(--fd);font-weight:700;font-size:13px;letter-spacing:.02em;padding:12px 28px;border:none;border-radius:11px;cursor:pointer;transition:all .2s}
         .btn-bk{background:linear-gradient(135deg,var(--bk),#2d2d3a);color:var(--wh);box-shadow:var(--shadow-md)}
         .btn-bk:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(13,13,15,.2)}
         .btn-bk:disabled{background:var(--ln);color:var(--soft);cursor:default;transform:none;box-shadow:none}
-        .btn-ol{background:transparent;color:var(--mid);border:1.5px solid var(--ln);border-radius:12px}
+        .btn-ol{background:transparent;color:var(--mid);border:1.5px solid var(--ln);border-radius:11px}
         .btn-ol:hover{border-color:var(--ac);color:var(--ac)}
         .btn-full{width:100%}
-        .back-link{font-family:var(--fm);font-size:11px;letter-spacing:.1em;color:var(--soft);cursor:pointer;background:none;border:none;padding:12px 0;transition:color .15s}
+        .back-link{font-family:var(--fm);font-size:11px;letter-spacing:.1em;color:var(--soft);cursor:pointer;background:none;border:none;padding:10px 0;transition:color .15s}
         .back-link:hover{color:var(--ac)}
 
         /* Stats */
-        .stats-row{display:grid;grid-template-columns:repeat(3,1fr);background:var(--wh);border:1.5px solid var(--ln);border-radius:16px;overflow:hidden;margin:20px 0;box-shadow:var(--shadow-sm)}
-        .stat-cell{padding:16px 8px;text-align:center;border-right:1px solid var(--ln)}
+        .stats-row{display:grid;grid-template-columns:repeat(3,1fr);background:var(--wh);border:1.5px solid var(--ln);border-radius:14px;overflow:hidden;margin:14px 0;box-shadow:var(--shadow-sm)}
+        .stat-cell{padding:12px 8px;text-align:center;border-right:1px solid var(--ln)}
         .stat-cell:last-child{border-right:none}
-        .stat-num{font-family:var(--fd);font-size:28px;font-weight:800;letter-spacing:-.03em}
-        .stat-label{font-family:var(--fm);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--soft);margin-top:4px}
+        .stat-num{font-family:var(--fd);font-size:24px;font-weight:800;letter-spacing:-.03em}
+        .stat-label{font-family:var(--fm);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--soft);margin-top:3px}
 
         /* Mode (quiz mode toggle) */
-        .mode-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:16px 0}
-        .mode-btn{background:var(--wh);border:1.5px solid var(--ln);border-radius:10px;padding:12px;font-family:var(--fb);
-            font-size:13px;font-weight:500;color:var(--mid);cursor:pointer;transition:all .15s;text-align:center;box-shadow:var(--shadow-sm)}
+        .mode-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:12px 0}
+        .mode-btn{background:var(--wh);border:1.5px solid var(--ln);border-radius:9px;padding:10px;font-family:var(--fb);
+            font-size:12px;font-weight:500;color:var(--mid);cursor:pointer;transition:all .15s;text-align:center;box-shadow:var(--shadow-sm)}
         .mode-btn.active{background:var(--ac-bg);border-color:var(--ac);color:var(--ac);font-weight:700}
 
         /* Quiz overlay */
@@ -246,9 +246,9 @@
         .spacer{height:80px}
 
         /* 弱点トラッカー */
-        .weak-section{margin-top:24px;background:var(--wh);border-radius:18px;padding:18px 18px 14px;box-shadow:var(--shadow-sm);border:1.5px solid var(--ln)}
-        .weak-title{font-family:var(--fd);font-weight:700;font-size:14px;letter-spacing:-.01em;margin-bottom:14px;display:flex;align-items:center;gap:6px}
-        .weak-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--ft)}
+        .weak-section{margin-top:14px;background:var(--wh);border-radius:14px;padding:14px 14px 10px;box-shadow:var(--shadow-sm);border:1.5px solid var(--ln)}
+        .weak-title{font-family:var(--fd);font-weight:700;font-size:13px;letter-spacing:-.01em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+        .weak-item{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--ft)}
         .weak-item:last-of-type{border-bottom:none}
         .weak-rank{font-size:18px;flex-shrink:0}
         .weak-info{flex:1;min-width:0}
@@ -281,7 +281,7 @@
             <div id="weakTopList"><p class="weak-empty">まだデータがないよ。問題を解いてみよう！</p></div>
             <button class="weak-reset-btn" onclick="if(confirm('弱点データをリセットしますか？')){weakTracker={};saveTracker();renderWeakTop();}">リセット</button>
         </div>
-        <div style="margin-top:20px">
+        <div style="margin-top:14px">
             <div class="label">Select Subject</div>
             <div class="subj-grid">
                 <button class="subj-item" data-subject="social"><div class="subj-icon"><span>🌍</span></div><div class="subj-text">社会</div><div class="subj-arrow">→</div></button>
@@ -299,7 +299,7 @@
             <div class="header-sub">JUKEN CAMP × AI</div>
             <div class="header-line"></div>
         </div>
-        <div id="currentCategory" style="font-family:var(--fd);font-weight:700;font-size:18px;margin-top:24px;letter-spacing:-.02em"></div>
+        <div id="currentCategory" style="font-family:var(--fd);font-weight:700;font-size:16px;margin-top:16px;letter-spacing:-.02em"></div>
         <div class="stats-row">
             <div class="stat-cell"><div class="stat-num" id="correctCount">0</div><div class="stat-label">Correct</div></div>
             <div class="stat-cell"><div class="stat-num" id="wrongCount">0</div><div class="stat-label">Wrong</div></div>
@@ -310,7 +310,7 @@
             <button id="randomModeBtn" class="mode-btn active">🎲 ランダム</button>
             <button id="sequentialModeBtn" class="mode-btn">📋 順番通り</button>
         </div>
-        <button id="startQuizButton" class="btn btn-bk btn-full" style="margin-top:24px">スタート →</button>
+        <button id="startQuizButton" class="btn btn-bk btn-full" style="margin-top:16px">スタート →</button>
         <div class="spacer"></div>
     </div>
 </div>
