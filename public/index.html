@@ -165,7 +165,7 @@
             max-width:min(480px,calc(100vw - 32px));padding:10px 18px;border-radius:18px;
             font-size:13px;line-height:1.6;font-family:var(--fb);
             pointer-events:none;text-align:left;
-            animation:bubbleFloat var(--bubble-duration,5s) cubic-bezier(.22,1,.36,1) forwards}
+            animation:bubbleFloat var(--bubble-duration,10s) cubic-bezier(.22,1,.36,1) forwards}
         .float-bubble.ai{background:rgba(240,239,255,.92);backdrop-filter:blur(8px);
             border:1px solid rgba(108,99,255,.2);color:var(--dk);
             box-shadow:0 4px 20px rgba(108,99,255,.12)}
@@ -173,6 +173,11 @@
         .float-bubble.ai.ng{background:rgba(255,241,242,.92);border-color:rgba(255,71,87,.2);color:#8b1a26}
         .float-bubble.user{background:rgba(108,99,255,.88);color:var(--wh);
             box-shadow:0 4px 20px rgba(108,99,255,.25)}
+        .float-bubble p{margin:0 0 8px}
+        .float-bubble p:last-child{margin-bottom:0}
+        @keyframes bubbleIn{
+            0%{opacity:0;transform:scale(.9);transform-origin:right bottom}
+            100%{opacity:1;transform:scale(1)}}
         @keyframes bubbleFloat{
             0%{opacity:0;bottom:72px;transform:scale(.9);transform-origin:right bottom}
             12%{opacity:1;transform:scale(1)}
@@ -430,10 +435,16 @@
         <div class="mode-row" style="flex-direction:column;align-items:flex-start;gap:8px;margin-top:4px">
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%">
                 <span class="mode-label">バブル表示時間</span>
-                <span style="font-family:var(--fm);font-size:11px;color:var(--ac);font-weight:600" id="bubbleDurLabel">5秒</span>
+                <span style="font-family:var(--fm);font-size:11px;color:var(--ac);font-weight:600" id="bubbleDurLabel">10秒</span>
             </div>
-            <input type="range" id="bubbleDurSlider" min="3" max="12" step="1" value="5"
+            <input type="range" id="bubbleDurSlider" min="3" max="60" step="1" value="10"
                 style="width:100%;accent-color:var(--ac);cursor:pointer;height:4px">
+            <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+                <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;color:var(--mid);font-family:var(--fb)">
+                    <input type="checkbox" id="bubbleInfinite" style="accent-color:var(--ac);width:14px;height:14px">
+                    無制限（次のチャットまで表示）
+                </label>
+            </div>
         </div>
     </div>
 </div>
