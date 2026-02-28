@@ -226,6 +226,9 @@ function toast(t) {
 function hideAll() {
     document.querySelectorAll('.overlay').forEach(m => m.classList.remove('show'));
     document.getElementById('quizModal').classList.remove('show');
+    // AI先生バーを常時表示
+    const bar = document.getElementById('aiBar');
+    if (bar) { bar.style.display = 'flex'; bar.style.visibility = 'visible'; bar.style.opacity = '1'; }
 }
 
 function show(id) {
@@ -233,7 +236,14 @@ function show(id) {
     if (id !== 'quizModal') clearSel();
     document.getElementById(id).classList.add('show');
 }
-function goBackToMain() { hideAll(); sfx.click(); }
+function goBackToMain() { hideAll(); clearSel(); sel = []; seqIdx = 0; used = []; sfx.click(); }
+function goBackFromGame() {
+    sfx.click();
+    clearSel(); sel = []; seqIdx = 0; used = [];
+    hideAll();
+    document.getElementById('gameScreen').classList.add('hidden');
+    document.getElementById('mainScreen').classList.remove('hidden');
+}
 function goBackToSocial() { show('socialModal'); sfx.click(); }
 function goBackToScience() { show('scienceModal'); sfx.click(); }
 function goBackToEnglish() { show('englishModal'); sfx.click(); }
@@ -251,6 +261,7 @@ function initCats() {
         const cId = s.split('_').map((w, i) => i ? w[0].toUpperCase() + w.slice(1) : w).join('') + 'Categories';
         const c = document.getElementById(cId);
         if (!c) return;
+        c.innerHTML = ''; // 二重登録防止：既存ボタンをクリア
         categories[s].forEach(cat => {
             const b = document.createElement('button');
             b.className = 'cat-item'; b.textContent = cat.name;
@@ -263,6 +274,7 @@ function initCats() {
     Object.entries(gradeMap).forEach(([s, grades]) => {
         const c = document.getElementById(s + 'Categories');
         if (!c) return;
+        c.innerHTML = ''; // 二重登録防止：既存ボタンをクリア
         Object.entries(grades).forEach(([label, [start, end]]) => {
             const d = document.createElement('div');
             d.className = 'grade-div'; d.textContent = label;
@@ -286,9 +298,15 @@ function clearSel() {
 }
 
 function togCat(subj, id, btn) {
-    sfx.click(); btn.classList.toggle('active');
+    sfx.click();
     const i = sel.indexOf(id);
-    if (i > -1) sel.splice(i, 1); else sel.push(id);
+    if (i > -1) {
+        sel.splice(i, 1);
+        btn.classList.remove('active');
+    } else {
+        sel.push(id);
+        btn.classList.add('active');
+    }
     const sid = 'start' + subj.charAt(0).toUpperCase() + subj.slice(1).replace(/_(\w)/g, (_, c) => c.toUpperCase()) + 'Quiz';
     const sb = document.getElementById(sid);
     if (sb) sb.disabled = sel.length === 0;
@@ -378,12 +396,12 @@ function showQuizUI(q) {
     });
 
     nb.onclick = () => { sfx.click(); openQuiz(); };
-    document.getElementById('quizBack').onclick = () => { sfx.click(); hideAll(); };
+    document.getElementById('quizBack').onclick = () => { sfx.click(); clearSel(); hideAll(); };
     show('quizModal');
 }
 
 // ---- クイックチップ ----
-const defaultChips = ['教えて', 'どう覚える？', 'もっと詳しく'];
+const defaultChips = ['教えて', 'どう覚える？', 'もっと分かりやすく'];
 
 function renderQuickChips() {
     const el = document.getElementById('quickChips');
@@ -542,7 +560,7 @@ function updateChips() {
     if (!curQuiz) return;
     const corr = curQuiz.opts[curQuiz.ans];
     const suggestions = [
-        '「' + corr + '」をもっと詳しく教えて',
+        '「' + corr + '」をもっと分かりやすく教えて',
         'この問題の覚え方は？',
         '入試でどう出題される？',
         '関連する重要用語は？'
@@ -589,7 +607,7 @@ async function sendChat(message, isAuto = false) {
     if (!message.trim()) return;
     const inp = document.getElementById('chatIn');
     const btn = document.getElementById('chatSd');
-    const displayText = isAuto ? '🤖 もっと詳しく教えて' : message;
+    const displayText = isAuto ? '🤖 もっと分かりやすく教えて' : message;
 
     if (!isAuto) { inp.value = ''; btn.disabled = true; }
 
@@ -693,13 +711,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Subject buttons
     document.querySelectorAll('[data-subject]').forEach(b => {
-        b.addEventListener('click', () => { sfx.click(); show(b.dataset.subject + 'Modal'); });
+        b.addEventListener('click', () => { sfx.click(); b.blur(); show(b.dataset.subject + 'Modal'); });
     });
 
     // Category buttons
     document.querySelectorAll('[data-category]').forEach(b => {
         b.addEventListener('click', () => {
-            sfx.click();
+            sfx.click(); b.blur();
             const cat = b.dataset.category;
             const mid = cat.split('_').map((w, i) => i ? w[0].toUpperCase() + w.slice(1) : w).join('') + 'Modal';
             show(mid);
@@ -728,13 +746,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('randomModeBtn').addEventListener('click', () => {
         sfx.click(); qMode = 'random';
-        document.getElementById('randomModeBtn').classList.add('active');
-        document.getElementById('sequentialModeBtn').classList.remove('active');
+        document.getElementById('randomModeBtn').classList.add('mode-active');
+        document.getElementById('sequentialModeBtn').classList.remove('mode-active');
     });
     document.getElementById('sequentialModeBtn').addEventListener('click', () => {
         sfx.click(); qMode = 'sequential';
-        document.getElementById('sequentialModeBtn').classList.add('active');
-        document.getElementById('randomModeBtn').classList.remove('active');
+        document.getElementById('sequentialModeBtn').classList.add('mode-active');
+        document.getElementById('randomModeBtn').classList.remove('mode-active');
     });
 
     // 入力欄の変化でsendボタン有効化
