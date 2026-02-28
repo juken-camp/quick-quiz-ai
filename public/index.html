@@ -138,46 +138,27 @@
             box-shadow:0 -8px 40px rgba(108,99,255,.15)}
         .chat-pn.show{display:flex;flex-direction:column;animation:ci .35s cubic-bezier(.22,1,.36,1)}
         @keyframes ci{from{transform:translateY(100%)}to{transform:translateY(0)}}
-        .chat-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--ln);flex-shrink:0}
-        .chat-tt{font-family:var(--fd);font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
+        /* ヘッダー：タイトル＋⚙️＋✕ */
+        .chat-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--ln);flex-shrink:0;gap:8px}
+        .chat-tt{font-family:var(--fd);font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;flex:1}
         .chat-tt::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--ac);
-            box-shadow:0 0 8px var(--ac);animation:pulse 2s infinite}
+            box-shadow:0 0 8px var(--ac);animation:pulse 2s infinite;flex-shrink:0}
+        .chat-hd-btns{display:flex;gap:6px;align-items:center}
+        .chat-setting-btn{height:30px;padding:0 10px;border-radius:15px;background:var(--ft);border:1.5px solid var(--ln);
+            font-size:11px;font-weight:600;color:var(--mid);cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .15s;white-space:nowrap}
+        .chat-setting-btn:hover{border-color:var(--ac);color:var(--ac);background:var(--ac-bg)}
+        .chat-setting-btn.open{background:var(--ac-bg);border-color:var(--ac);color:var(--ac)}
         .chat-x{width:30px;height:30px;border-radius:50%;background:var(--ft);border:none;font-size:16px;
             cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--mid);transition:all .15s}
         .chat-x:hover{background:var(--bk);color:var(--wh)}
-        .chat-ms{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:10px;min-height:100px;max-height:40vh}
-        .chat-m{max-width:85%;padding:12px 16px;font-size:13px;line-height:1.7;word-break:break-word;border-radius:16px}
-        .chat-m.u{background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--wh);
-            align-self:flex-end;border-bottom-right-radius:4px;box-shadow:var(--glow)}
-        .chat-m.a{background:var(--ft);color:var(--dk);align-self:flex-start;border-bottom-left-radius:4px;border:1px solid var(--ln)}
-        .chat-m.a strong{font-weight:600;color:var(--ac)}.chat-m.a p{margin:5px 0}
-        .chat-m.a ul,.chat-m.a ol{padding-left:18px;margin:5px 0}
-        .chat-m.a li{margin:3px 0}.chat-m.a code{font-family:var(--fm);background:var(--ac-bg);color:var(--ac);padding:2px 6px;border-radius:4px;font-size:12px}
-        .chat-m.a h3,.chat-m.a h4{font-size:14px;font-weight:700;margin:8px 0 4px;color:var(--bk)}
-        .typing span{display:inline-block;width:6px;height:6px;background:var(--ac2);border-radius:50%;margin:0 2px;animation:bo 1.2s infinite}
-        .typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}
-        @keyframes bo{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
-        .chips{display:flex;flex-wrap:wrap;gap:6px;padding:4px 20px 8px;flex-shrink:0}
-        .chip{background:var(--wh);border:1.5px solid var(--ln);border-radius:20px;padding:7px 14px;
-            font-size:11px;font-weight:500;color:var(--dk);cursor:pointer;transition:all .15s;white-space:nowrap}
-        .chip:hover{border-color:var(--ac);color:var(--ac);background:var(--ac-bg)}
-        .chat-ia{display:flex;gap:8px;padding:12px 20px 28px;border-top:1px solid var(--ln);flex-shrink:0;background:var(--wh)}
-        .chat-ia input{flex:1;background:var(--ft);border:1.5px solid var(--ln);border-radius:24px;padding:11px 18px;
-            font-size:14px;font-family:var(--fb);color:var(--bk);outline:none;transition:all .2s}
-        .chat-ia input:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(108,99,255,.1)}
-        .chat-ia input::placeholder{color:var(--soft)}
-        .send-b{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));
-            border:none;color:var(--wh);font-size:18px;cursor:pointer;flex-shrink:0;
-            display:flex;align-items:center;justify-content:center;transition:all .15s;box-shadow:var(--glow)}
-        .send-b:hover{transform:scale(1.08)}.send-b:disabled{background:var(--ln);box-shadow:none}
-
-        /* モード選択パネル */
-        .mode-panel{padding:10px 16px;border-bottom:1px solid var(--ln);background:var(--ft);flex-shrink:0;display:flex;flex-direction:column;gap:7px}
+        /* 折りたたみモードパネル */
+        .mode-panel{padding:8px 16px 10px;border-bottom:1px solid var(--ln);background:var(--ft);flex-shrink:0;display:none;flex-direction:column;gap:6px}
+        .mode-panel.open{display:flex}
         .mode-row{display:flex;align-items:center;gap:8px}
         .mode-row-toggle{justify-content:space-between}
         .mode-label{font-family:var(--fm);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);white-space:nowrap;min-width:32px}
         .mode-btns{display:flex;gap:4px;flex-wrap:wrap}
-        .mode-btn{font-size:11px;font-family:var(--fb);font-weight:500;padding:4px 11px;
+        .mode-btn{font-size:11px;font-family:var(--fb);font-weight:500;padding:4px 10px;
             border:1.5px solid var(--ln);border-radius:20px;background:var(--wh);
             color:var(--mid);cursor:pointer;transition:all .15s;white-space:nowrap}
         .mode-btn:hover{border-color:var(--ac2);color:var(--ac)}
@@ -189,10 +170,35 @@
         .toggle-slider::before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:var(--wh);border-radius:50%;transition:transform .2s;box-shadow:var(--shadow-sm)}
         .toggle-wrap input:checked + .toggle-slider{background:var(--ac);box-shadow:var(--glow)}
         .toggle-wrap input:checked + .toggle-slider::before{transform:translateX(18px)}
+        /* 会話エリア */
+        .chat-ms{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-height:120px;max-height:52vh}
+        .chat-m{max-width:85%;padding:10px 14px;font-size:13px;line-height:1.7;word-break:break-word;border-radius:16px}
+        .chat-m.u{background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--wh);
+            align-self:flex-end;border-bottom-right-radius:4px;box-shadow:var(--glow)}
+        .chat-m.a{background:var(--ft);color:var(--dk);align-self:flex-start;border-bottom-left-radius:4px;border:1px solid var(--ln)}
+        .chat-m.a strong{font-weight:600;color:var(--ac)}.chat-m.a p{margin:5px 0}
+        .chat-m.a ul,.chat-m.a ol{padding-left:18px;margin:5px 0}
+        .chat-m.a li{margin:3px 0}.chat-m.a code{font-family:var(--fm);background:var(--ac-bg);color:var(--ac);padding:2px 6px;border-radius:4px;font-size:12px}
+        .chat-m.a h3,.chat-m.a h4{font-size:14px;font-weight:700;margin:8px 0 4px;color:var(--bk)}
+        .typing span{display:inline-block;width:6px;height:6px;background:var(--ac2);border-radius:50%;margin:0 2px;animation:bo 1.2s infinite}
+        .typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}
+        @keyframes bo{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+        .chips{display:flex;flex-wrap:wrap;gap:5px;padding:4px 16px 6px;flex-shrink:0}
+        .chip{background:var(--wh);border:1.5px solid var(--ln);border-radius:20px;padding:5px 12px;
+            font-size:11px;font-weight:500;color:var(--dk);cursor:pointer;transition:all .15s;white-space:nowrap}
+        .chip:hover{border-color:var(--ac);color:var(--ac);background:var(--ac-bg)}
+        .chat-ia{display:flex;gap:8px;padding:10px 16px 24px;border-top:1px solid var(--ln);flex-shrink:0;background:var(--wh)}
+        .chat-ia input{flex:1;background:var(--ft);border:1.5px solid var(--ln);border-radius:24px;padding:10px 16px;
+            font-size:14px;font-family:var(--fb);color:var(--bk);outline:none;transition:all .2s}
+        .chat-ia input:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(108,99,255,.1)}
+        .chat-ia input::placeholder{color:var(--soft)}
+        .send-b{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));
+            border:none;color:var(--wh);font-size:18px;cursor:pointer;flex-shrink:0;
+            display:flex;align-items:center;justify-content:center;transition:all .15s;box-shadow:var(--glow)}
+        .send-b:hover{transform:scale(1.08)}.send-b:disabled{background:var(--ln);box-shadow:none}
 
         /* FABs */
-        .fab-row{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:none;gap:10px;z-index:150;white-space:nowrap}
-        .fab-row.vis{display:flex;animation:fi .3s}
+        .fab-row{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:150;white-space:nowrap;animation:fi .3s}
         .fab{height:48px;border-radius:24px;border:none;font-family:var(--fd);font-weight:700;font-size:13px;
             cursor:pointer;display:flex;align-items:center;gap:8px;padding:0 22px;transition:all .2s;box-shadow:var(--shadow-md);white-space:nowrap;flex-shrink:0}
         .fab:hover{transform:translateY(-3px)}
@@ -262,7 +268,7 @@
     <!-- GAME SCREEN -->
     <div id="gameScreen" class="screen hidden">
         <div class="header">
-            <div class="header-logo" id="logoGame" style="cursor:pointer" onclick="document.getElementById('fabBack').click()">Quick Quiz<span class="ai">AI</span></div>
+            <div class="header-logo" id="logoGame" onclick="sfx&&sfx.click();sel=[];seqIdx=0;used=[];document.getElementById('gameScreen').classList.add('hidden');document.getElementById('mainScreen').classList.remove('hidden');hideAll&&hideAll();">Quick Quiz<span class="ai">AI</span></div>
             <div class="header-sub">JUKEN CAMP × AI</div>
             <div class="header-line"></div>
         </div>
@@ -338,11 +344,14 @@
 <div class="chat-bd" id="chatBd"></div>
 <div class="chat-pn" id="chatPn">
     <div class="chat-hd">
-        <div class="chat-tt">✨ AI 学習アシスタント</div>
-        <button class="chat-x" id="chatX">✕</button>
+        <div class="chat-tt">✨ AI先生</div>
+        <div class="chat-hd-btns">
+            <button class="chat-setting-btn" id="chatSettingBtn">⚙️ 設定</button>
+            <button class="chat-x" id="chatX">✕</button>
+        </div>
     </div>
-    <!-- モード選択パネル -->
-    <div class="mode-panel">
+    <!-- モード選択パネル（折りたたみ） -->
+    <div class="mode-panel" id="modePanel">
         <div class="mode-row">
             <span class="mode-label">口調</span>
             <div class="mode-btns">
