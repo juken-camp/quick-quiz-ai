@@ -228,7 +228,7 @@ function hideAll() {
     document.getElementById('quizModal').classList.remove('show');
 }
 
-function show(id) { hideAll(); document.getElementById(id).classList.add('show'); }
+function show(id) { hideAll(); clearSel(); document.getElementById(id).classList.add('show'); }
 function goBackToMain() { hideAll(); sfx.click(); }
 function goBackToSocial() { show('socialModal'); sfx.click(); }
 function goBackToScience() { show('scienceModal'); sfx.click(); }
@@ -415,17 +415,21 @@ function renderHistory() {
 }
 
 // ---- AI リアクション ----
+const fallbackOk = ['👍 よくできました！', '🎯 完璧！', '✨ さすが！', '🙌 正解！', '💪 その調子！'];
+const fallbackNg = ['💪 次は大丈夫！', '🤔 惜しかった！', '😤 次こそ！', '🔥 ドンマイ！', '👊 負けるな！'];
+
 async function sendReaction(q, chosenTxt, correctText, isCorrect) {
     // タイピングバブル（仮）
     const typingBubble = document.createElement('div');
     typingBubble.className = 'float-bubble ai' + (isCorrect ? ' ok' : ' ng');
-    typingBubble.style.cssText = 'animation:none;bottom:72px;opacity:1;right:16px';
+    typingBubble.style.cssText = 'animation:none;bottom:72px;opacity:0;right:16px;transition:opacity .15s';
     typingBubble.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
     document.body.appendChild(typingBubble);
+    requestAnimationFrame(() => { typingBubble.style.opacity = '1'; });
 
     const reactionPrompt = isCorrect
-        ? `生徒が「${q.q}」に正解した。一言だけ短く褒めて。絵文字1つ使って15字以内。`
-        : `生徒が「${q.q}」を「${chosenTxt}」と間違えた（正解:${correctText}）。一言だけ短く励まして。絵文字1つ使って20字以内。`;
+        ? `生徒が「${q.q}」に正解した。短く一言だけ褒めて。絵文字1つ使って15字以内。「よくできました」「さすが」「完璧」「正解」「その調子」などのバリエーションで毎回違う表現にすること。`
+        : `生徒が「${q.q}」を「${chosenTxt}」と間違えた（正解:${correctText}）。短く一言だけ励まして。絵文字1つ使って20字以内。「惜しい」「ドンマイ」「次こそ」「大丈夫」「負けるな」などのバリエーションで毎回違う表現にすること。絶対に「惜しい」だけで始めないこと。`;
 
     try {
         const r = await fetch('/api/chat', {
@@ -439,11 +443,16 @@ async function sendReaction(q, chosenTxt, correctText, isCorrect) {
             })
         });
         const d = await r.json();
-        const replyText = d.reply || (isCorrect ? '👍 よくできました！' : '💪 次は大丈夫！');
+        const fb = isCorrect ? fallbackOk : fallbackNg;
+        const replyText = d.reply || fb[Math.floor(Math.random() * fb.length)];
         typingBubble.remove();
         spawnBubble(replyText, 'ai' + (isCorrect ? ' ok' : ' ng'));
         addToHistory('ai', replyText);
-    } catch(e) { typingBubble.remove(); }
+    } catch(e) {
+        typingBubble.remove();
+        const fb = isCorrect ? fallbackOk : fallbackNg;
+        spawnBubble(fb[Math.floor(Math.random() * fb.length)], 'ai' + (isCorrect ? ' ok' : ' ng'));
+    }
 }
 
 // ---- チップ更新 ----
@@ -476,12 +485,7 @@ function getCtx() {
 function getModePrompt() {
     return `【AIの話し方】${aiStylePrompt[aiMode.style]}
 【説明の深さ】${aiDepthPrompt[aiMode.depth]}
-【つながりマップ】説明の最後に必ず以下の形式でつながりマップを出してください：
-🗺️ **つながりマップ**
-・[関連キーワード1]：[一言説明]
-・[関連キーワード2]：[一言説明]
-・[関連キーワード3]：[一言説明]
-深さが「deep」なら5つ、それ以外は3つ出してください。`;
+【返答スタイル】最初の返答は3〜5文のコンパクトな会話文で答えてください。箇条書き・見出し・「キーワード：説明」形式などのマークダウン記号は一切使わないこと。もっと聞きたいと言われたら詳しく説明してください。`;
 }
 
 function md2html(md) {
@@ -517,9 +521,10 @@ async function sendChat(message, isAuto = false) {
     // タイピングバブル（固定・アニメなし）
     const typingBubble = document.createElement('div');
     typingBubble.className = 'float-bubble ai';
-    typingBubble.style.cssText = 'animation:none;bottom:72px;opacity:1;right:16px';
+    typingBubble.style.cssText = 'animation:none;bottom:72px;opacity:0;right:16px;transition:opacity .15s';
     typingBubble.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
     document.body.appendChild(typingBubble);
+    requestAnimationFrame(() => { typingBubble.style.opacity = '1'; });
 
     chatHistory.push({ role: 'user', content: message });
     if (chatHistory.length > 10) chatHistory = chatHistory.slice(-10);
@@ -599,7 +604,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Category buttons
     document.querySelectorAll('[data-category]').forEach(b => {
         b.addEventListener('click', () => {
-            sfx.click(); clearSel();
+            sfx.click();
             const cat = b.dataset.category;
             const mid = cat.split('_').map((w, i) => i ? w[0].toUpperCase() + w.slice(1) : w).join('') + 'Modal';
             show(mid);
