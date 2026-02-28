@@ -637,14 +637,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('randomModeBtn').classList.remove('active');
     });
 
-    // FAB: back
-    document.getElementById('fabBack').addEventListener('click', () => {
-        sfx.click(); clearSel(); seqIdx = 0; used = [];
-        document.getElementById('gameScreen').classList.add('hidden');
-        document.getElementById('mainScreen').classList.remove('hidden');
-        hideAll();
-    });
-
     // 入力欄の変化でsendボタン有効化
     document.getElementById('chatIn').addEventListener('input', e => {
         document.getElementById('chatSd').disabled = !e.target.value.trim();
