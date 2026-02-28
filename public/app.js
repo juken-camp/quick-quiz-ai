@@ -377,29 +377,54 @@ function showQuizUI(q) {
     show('quizModal');
 }
 
-// ---- ヘッダーステータス更新 ----
-let statusTimer = null;
-function showStatus(text, type = '') {
-    const el = document.getElementById('chatStatus');
-    if (!el) return;
-    el.textContent = text;
-    el.className = 'chat-status show' + (type ? ' ' + type : '');
-    clearTimeout(statusTimer);
-    statusTimer = setTimeout(() => {
-        el.classList.remove('show');
-    }, 6000);
+// ---- 浮遊バブル表示 ----
+function spawnBubble(text, type = 'ai') {
+    const el = document.createElement('div');
+    el.className = `float-bubble ${type}`;
+    el.innerHTML = text;
+    // 画面下部（AIバーの上）から開始
+    el.style.bottom = '72px';
+    document.body.appendChild(el);
+    // アニメーション終了後に削除
+    el.addEventListener('animationend', () => el.remove());
 }
 
-// ---- AI リアクション（正解・不正解に短く反応） ----
+// ---- 履歴管理 ----
+let historyLog = []; // {role:'user'|'ai', text:string}
+
+function addToHistory(role, text) {
+    historyLog.push({ role, text });
+    if (historyLog.length > 60) historyLog = historyLog.slice(-60);
+}
+
+function renderHistory() {
+    const list = document.getElementById('histList');
+    if (!list) return;
+    if (historyLog.length === 0) {
+        list.innerHTML = '<div class="hist-empty">まだ会話がないよ！</div>';
+        return;
+    }
+    list.innerHTML = '';
+    historyLog.forEach(({ role, text }) => {
+        const el = document.createElement('div');
+        el.className = 'hist-m ' + (role === 'user' ? 'u' : 'a');
+        el.innerHTML = role === 'ai' ? md2html(text) : text;
+        list.appendChild(el);
+    });
+    list.scrollTop = list.scrollHeight;
+}
+
+// ---- AI リアクション ----
 async function sendReaction(q, chosenTxt, correctText, isCorrect) {
-    const box = document.getElementById('chatMs');
-    const tb = document.createElement('div');
-    tb.className = 'chat-m a react';
-    tb.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
-    box.appendChild(tb); box.scrollTop = box.scrollHeight;
+    // タイピングバブル（仮）
+    const typingBubble = document.createElement('div');
+    typingBubble.className = 'float-bubble ai' + (isCorrect ? ' ok' : ' ng');
+    typingBubble.style.cssText = 'animation:none;bottom:72px;opacity:1;left:50%;transform:translateX(-50%)';
+    typingBubble.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+    document.body.appendChild(typingBubble);
 
     const reactionPrompt = isCorrect
-        ? `生徒が「${q.q}」に正解した（正解:${correctText}）。一言だけ短く褒めて。絵文字1つ使って15字以内。`
+        ? `生徒が「${q.q}」に正解した。一言だけ短く褒めて。絵文字1つ使って15字以内。`
         : `生徒が「${q.q}」を「${chosenTxt}」と間違えた（正解:${correctText}）。一言だけ短く励まして。絵文字1つ使って20字以内。`;
 
     try {
@@ -414,38 +439,38 @@ async function sendReaction(q, chosenTxt, correctText, isCorrect) {
             })
         });
         const d = await r.json();
-        const replyText = d.reply || (isCorrect ? '👍' : '💪');
-        tb.innerHTML = replyText;
-        // ヘッダーのステータスバーにも同じひとことを表示
-        showStatus(replyText, isCorrect ? 'ok' : 'ng');
-    } catch(e) { tb.remove(); }
-    box.scrollTop = box.scrollHeight;
+        const replyText = d.reply || (isCorrect ? '👍 よくできました！' : '💪 次は大丈夫！');
+        typingBubble.remove();
+        spawnBubble(replyText, 'ai' + (isCorrect ? ' ok' : ' ng'));
+        addToHistory('ai', replyText);
+    } catch(e) { typingBubble.remove(); }
 }
 
-
+// ---- チップ更新 ----
 function updateChips() {
-    const el = document.getElementById('chips'); el.innerHTML = '';
+    const el = document.getElementById('chips');
+    if (!el) return;
+    el.innerHTML = '';
     if (!curQuiz) return;
     const corr = curQuiz.opts[curQuiz.ans];
     const suggestions = [
         '「' + corr + '」をもっと詳しく教えて',
-        'この問題の覚え方のコツは？',
+        'この問題の覚え方は？',
         '入試でどう出題される？',
-        '関連する重要用語を教えて'
+        '関連する重要用語は？'
     ];
     suggestions.forEach(t => {
         const c = document.createElement('button');
         c.className = 'chip'; c.textContent = t;
-        c.onclick = () => sendChat(t);
+        c.onclick = () => { document.getElementById('histOv').classList.remove('show'); sendChat(t); };
         el.appendChild(c);
     });
 }
 
 function getCtx() {
-    const base = curQuiz
+    return curQuiz
         ? '問題: ' + curQuiz.q + '\n正解: ' + curQuiz.opts[curQuiz.ans] + '\n解説: ' + (curQuiz.exp || 'なし') + '\n教科: ' + curLabel + '\n選択肢: ' + curQuiz.opts.join(', ')
         : '';
-    return base;
 }
 
 function getModePrompt() {
@@ -479,21 +504,22 @@ function md2html(md) {
 
 async function sendChat(message, isAuto = false) {
     if (!message.trim()) return;
-    const box = document.getElementById('chatMs');
     const inp = document.getElementById('chatIn');
     const btn = document.getElementById('chatSd');
+    const displayText = isAuto ? '🤖 もっと詳しく教えて' : message;
 
-    const ub = document.createElement('div');
-    ub.className = 'chat-m u';
-    ub.textContent = isAuto ? '🤖 もっと詳しく教えて' : message;
-    box.appendChild(ub);
-    if (!isAuto) { inp.value = ''; }
-    btn.disabled = true;
+    if (!isAuto) { inp.value = ''; btn.disabled = true; }
 
-    const tb = document.createElement('div');
-    tb.className = 'chat-m a';
-    tb.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
-    box.appendChild(tb); box.scrollTop = box.scrollHeight;
+    // ユーザーバブル
+    spawnBubble(displayText, 'user');
+    addToHistory('user', displayText);
+
+    // タイピングバブル（固定・アニメなし）
+    const typingBubble = document.createElement('div');
+    typingBubble.className = 'float-bubble ai';
+    typingBubble.style.cssText = 'animation:none;bottom:72px;opacity:1;left:50%;transform:translateX(-50%)';
+    typingBubble.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+    document.body.appendChild(typingBubble);
 
     chatHistory.push({ role: 'user', content: message });
     if (chatHistory.length > 10) chatHistory = chatHistory.slice(-10);
@@ -506,48 +532,39 @@ async function sendChat(message, isAuto = false) {
         });
         const d = await r.json();
         const replyText = d.reply || d.error || 'エラーが発生しました';
-        tb.innerHTML = md2html(replyText);
+        typingBubble.remove();
+        spawnBubble(replyText, 'ai');
+        addToHistory('ai', replyText);
         chatHistory.push({ role: 'assistant', content: replyText });
         if (chatHistory.length > 10) chatHistory = chatHistory.slice(-10);
     } catch (e) {
-        tb.innerHTML = '<p>通信エラーが発生しました。もう一度試してね。</p>';
+        typingBubble.remove();
+        spawnBubble('通信エラーが発生しました。', 'ai');
     }
     btn.disabled = false;
-    box.scrollTop = box.scrollHeight;
 }
 
 // ---- モードUI初期化 ----
 function initModeUI() {
-    // スタイルボタン
     document.querySelectorAll('[data-style]').forEach(btn => {
-        if (btn.dataset.style === aiMode.style) btn.classList.add('mode-active');
         btn.addEventListener('click', () => {
             aiMode.style = btn.dataset.style;
-            saveAiMode();
             document.querySelectorAll('[data-style]').forEach(b => b.classList.remove('mode-active'));
             btn.classList.add('mode-active');
             sfx.click();
         });
     });
-    // 深さボタン
     document.querySelectorAll('[data-depth]').forEach(btn => {
-        if (btn.dataset.depth === aiMode.depth) btn.classList.add('mode-active');
         btn.addEventListener('click', () => {
             aiMode.depth = btn.dataset.depth;
-            saveAiMode();
             document.querySelectorAll('[data-depth]').forEach(b => b.classList.remove('mode-active'));
             btn.classList.add('mode-active');
             sfx.click();
         });
     });
-    // 自動分析トグル
     const tog = document.getElementById('autoAnalyzeTog');
     if (tog) {
-        tog.checked = aiMode.autoAnalyze;
-        tog.addEventListener('change', () => {
-            aiMode.autoAnalyze = tog.checked;
-            saveAiMode();
-        });
+        tog.addEventListener('change', () => { aiMode.autoAnalyze = tog.checked; });
     }
 }
 
@@ -559,12 +576,15 @@ document.addEventListener('DOMContentLoaded', () => {
     initCats();
     initModeUI();
 
+    // 起動時の待機バブル
+    setTimeout(() => spawnBubble('👋 問題を解いているときはそばにいます！<br>気になったことがあれば何でも聞いてね。', 'ai'), 800);
+
     // Subject buttons
     document.querySelectorAll('[data-subject]').forEach(b => {
         b.addEventListener('click', () => { sfx.click(); show(b.dataset.subject + 'Modal'); });
     });
 
-    // Category (sub-subject) buttons
+    // Category buttons
     document.querySelectorAll('[data-category]').forEach(b => {
         b.addEventListener('click', () => {
             sfx.click(); clearSel();
@@ -613,36 +633,10 @@ document.addEventListener('DOMContentLoaded', () => {
         hideAll();
     });
 
-    // FAB: AI
-    document.getElementById('fabAI').addEventListener('click', () => {
-        sfx.click();
-        const p = document.getElementById('chatPn'), bg = document.getElementById('chatBd');
-        if (p.classList.contains('show')) { p.classList.remove('show'); bg.classList.remove('show'); }
-        else { p.classList.add('show'); bg.classList.add('show'); updateChips(); }
+    // 入力欄の変化でsendボタン有効化
+    document.getElementById('chatIn').addEventListener('input', e => {
+        document.getElementById('chatSd').disabled = !e.target.value.trim();
     });
-
-    // FAB: AI（チャットにスクロール）
-    document.getElementById('fabAI').addEventListener('click', () => {
-        sfx.click();
-        document.getElementById('chatMs').scrollTop = document.getElementById('chatMs').scrollHeight;
-        document.getElementById('chatIn').focus();
-    });
-
-    document.getElementById('chatX') && document.getElementById('chatX').addEventListener('click', () => {});
-
-    document.getElementById('chatBd') && document.getElementById('chatBd').addEventListener('click', () => {});
-
-    // ⚙️ 設定ボタン：モードパネル開閉
-    document.getElementById('chatSettingBtn').addEventListener('click', () => {
-        const panel = document.getElementById('modePanel');
-        const btn = document.getElementById('chatSettingBtn');
-        const isOpen = panel.classList.toggle('open');
-        btn.classList.toggle('open', isOpen);
-        btn.textContent = isOpen ? '⚙️ 閉じる' : '⚙️ 設定';
-    });
-
-    // ドラッグで高さ調整
-    initChatDrag();
 
     // Chat send
     document.getElementById('chatSd').addEventListener('click', () => {
@@ -651,60 +645,30 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('chatIn').addEventListener('keydown', e => {
         if (e.key === 'Enter' && !e.isComposing) sendChat(document.getElementById('chatIn').value);
     });
+
+    // 設定オーバーレイ
+    document.getElementById('settingBtn').addEventListener('click', () => {
+        sfx.click();
+        document.getElementById('settingOv').classList.add('show');
+    });
+    document.getElementById('settingClose').addEventListener('click', () => {
+        document.getElementById('settingOv').classList.remove('show');
+    });
+    document.getElementById('settingOv').addEventListener('click', e => {
+        if (e.target === e.currentTarget) e.currentTarget.classList.remove('show');
+    });
+
+    // 履歴オーバーレイ
+    document.getElementById('histBtn').addEventListener('click', () => {
+        sfx.click();
+        updateChips();
+        renderHistory();
+        document.getElementById('histOv').classList.add('show');
+    });
+    document.getElementById('histClose').addEventListener('click', () => {
+        document.getElementById('histOv').classList.remove('show');
+    });
+    document.getElementById('histOv').addEventListener('click', e => {
+        if (e.target === e.currentTarget) e.currentTarget.classList.remove('show');
+    });
 });
-
-// ---- チャット高さドラッグ ----
-function initChatDrag() {
-    const pn = document.getElementById('chatPn');
-    const handle = document.getElementById('chatDrag');
-    const spacer = document.querySelector('.chat-spacer');
-    if (!pn || !handle) return;
-
-    let startY = 0, startH = 0, dragging = false, rafId = null;
-
-    function updateHeight(h) {
-        const minH = 56, maxH = Math.floor(window.innerHeight * 0.85);
-        h = Math.max(minH, Math.min(maxH, h));
-        pn.style.height = h + 'px';
-        if (spacer) spacer.style.height = (h + 10) + 'px';
-    }
-
-    function onDragStart(y) {
-        dragging = true;
-        startY = y;
-        startH = pn.offsetHeight;
-        // ドラッグ中はtransitionを切ってカクつき防止
-        pn.style.transition = 'none';
-        document.body.style.userSelect = 'none';
-    }
-
-    function onDragMove(y) {
-        if (!dragging) return;
-        const dy = startY - y;
-        if (rafId) cancelAnimationFrame(rafId);
-        rafId = requestAnimationFrame(() => updateHeight(startH + dy));
-    }
-
-    function onDragEnd() {
-        dragging = false;
-        pn.style.transition = '';
-        document.body.style.userSelect = '';
-        if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-    }
-
-    // タッチ
-    handle.addEventListener('touchstart', e => {
-        onDragStart(e.touches[0].clientY);
-        e.preventDefault();
-    }, { passive: false });
-    handle.addEventListener('touchmove', e => {
-        onDragMove(e.touches[0].clientY);
-        e.preventDefault();
-    }, { passive: false });
-    handle.addEventListener('touchend', onDragEnd);
-
-    // マウス
-    handle.addEventListener('mousedown', e => onDragStart(e.clientY));
-    document.addEventListener('mousemove', e => onDragMove(e.clientY));
-    document.addEventListener('mouseup', onDragEnd);
-}
