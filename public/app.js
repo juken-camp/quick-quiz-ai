@@ -140,6 +140,9 @@ const gradeMap = {
 // ---- State ----
 let sel = [], cc = 0, wc = 0, tc = 0, used = [], qMode = 'random', seqIdx = 0, curSubj = '', curLabel = '', curQuiz = null;
 
+// ---- Lap (反復) State ----
+let lapCurrent = 1, lapWrongIds = [], lapPool = [], lapOrigPool = [];
+
 // ---- 会話履歴 & 弱点トラッカー ----
 let chatHistory = [];      // [{role:'user'|'assistant', content:'...'}]
 let weakTracker = {};      // {categoryId: {correct:0, wrong:0}}
@@ -204,23 +207,55 @@ function renderWeakTop() {
         .sort((a, b) => getWeakRate(b[1]) - getWeakRate(a[1]))
         .slice(0, 3);
     if (entries.length === 0) {
-        el.innerHTML = '<p class="weak-empty">まだデータがないよ。問題を解いてみよう！</p>';
+        el.innerHTML = '<p class="tracker-empty">まだデータがないよ。問題を解いてみよう！</p>';
         return;
     }
     el.innerHTML = entries.map(([id, s], i) => {
         const total = s.correct + s.wrong;
-        const rate = Math.round((s.wrong / total) * 100);
-        const emoji = i === 0 ? '🔴' : i === 1 ? '🟠' : '🟡';
-        return `<div class="weak-item">
-            <span class="weak-rank">${emoji}</span>
-            <div class="weak-info">
-                <div class="weak-name">${getCategoryName(id)}</div>
-                <div class="weak-bar-wrap"><div class="weak-bar" style="width:${rate}%"></div></div>
+        const wrongRate = Math.round((s.wrong / total) * 100);
+        const medals = ['🥇','🥈','🥉'];
+        return `<div class="tracker-item" data-unit-key="${id}" onclick="window.startQuizFromTracker('${id}')">
+            <span class="tracker-rank">${medals[i]||''}</span>
+            <div class="tracker-info">
+                <div class="tracker-name">${getCategoryName(id)}</div>
+                <div class="tracker-bar-wrap"><div class="tracker-bar weak" style="width:${wrongRate}%"></div></div>
             </div>
-            <span class="weak-pct">${rate}%<br><small>不正解</small></span>
+            <span class="tracker-pct weak">${wrongRate}%<br><small>${s.wrong}/${total} ミス</small></span>
+            <span class="tracker-arrow">→</span>
         </div>`;
     }).join('');
 }
+
+// ---- カテゴリIDから教科を逆引き ----
+function findSubjectForCategory(catId) {
+    for (const [subj, cats] of Object.entries(categories)) {
+        if (cats.some(c => c.id === catId)) return subj;
+    }
+    return null;
+}
+
+const subjectLabels = {
+    geography: '🗺️ 地理', history: '🏛️ 歴史', civics: '⚖️ 公民',
+    chemistry: '🧪 化学', biology: '🧬 生物', physics: '⚛️ 物理', earth: '🌍 地学',
+    english_words: '📝 英単語', english_phrases: '💬 英熟語', english_grammar: '📘 語形変化'
+};
+
+// ---- トラッカーから直接クイズ開始 ----
+window.startQuizFromTracker = function(catId) {
+    const subj = findSubjectForCategory(catId);
+    if (!subj) { toast('単元が見つかりません'); return; }
+    sfx.go();
+    // sel をこの単元だけにセットしてクイズ画面へ直行
+    sel = [catId];
+    curSubj = subj;
+    curLabel = subjectLabels[subj] || subj;
+    hideAll();
+    document.getElementById('mainScreen').classList.add('hidden');
+    document.getElementById('gameScreen').classList.remove('hidden');
+    document.getElementById('currentCategory').textContent = curLabel + ' — ' + getCategoryName(catId);
+    cc = wc = tc = 0; seqIdx = 0; used = []; updateStats();
+    chatHistory = [];
+};
 
 // ---- Helpers ----
 function toast(t) {
@@ -242,10 +277,19 @@ function show(id) {
     if (id !== 'quizModal') clearSel();
     document.getElementById(id).classList.add('show');
 }
-function goBackToMain() { curQuiz = null; renderQuickChips(); hideAll(); clearSel(); sel = []; seqIdx = 0; used = []; sfx.click(); }
+function goBackToMain() {
+    if (typeof window.stopQuizTimer === 'function') window.stopQuizTimer();
+    if (typeof window.hideLapBadge === 'function') window.hideLapBadge();
+    curQuiz = null; renderQuickChips(); hideAll(); clearSel(); sel = []; seqIdx = 0; used = [];
+    lapOrigPool = []; lapPool = []; lapWrongIds = []; lapCurrent = 1;
+    sfx.click();
+}
 function goBackFromGame() {
     sfx.click();
+    if (typeof window.stopQuizTimer === 'function') window.stopQuizTimer();
+    if (typeof window.hideLapBadge === 'function') window.hideLapBadge();
     clearSel(); sel = []; seqIdx = 0; used = [];
+    lapOrigPool = []; lapPool = []; lapWrongIds = []; lapCurrent = 1;
     curQuiz = null; renderQuickChips();
     hideAll();
     document.getElementById('gameScreen').classList.add('hidden');
@@ -327,6 +371,7 @@ function startQuiz(subj, label) {
     document.getElementById('gameScreen').classList.remove('hidden');
     document.getElementById('currentCategory').textContent = label;
     cc = wc = tc = 0; seqIdx = 0; used = []; updateStats();
+    lapOrigPool = []; lapPool = []; lapWrongIds = []; lapCurrent = 1;
     // チャット履歴リセット（新しいセッション開始）
     chatHistory = [];
     const box = document.getElementById('chatMs');
@@ -334,30 +379,123 @@ function startQuiz(subj, label) {
 }
 
 function openQuiz() {
-    const pool = [];
-    sel.forEach(id => { if (problemDatabase[id]) pool.push(...problemDatabase[id]); });
-    if (!pool.length) { toast('問題が見つかりません'); return; }
+    const cfg = window.quizSettings || {};
+    const maxLaps = cfg.lapCount || 1;
+
+    // ---- 初回起動: プールを構築 ----
+    if (!lapOrigPool.length) {
+        lapOrigPool = [];
+        sel.forEach(id => { if (problemDatabase[id]) lapOrigPool.push(...problemDatabase[id]); });
+        if (!lapOrigPool.length) { toast('問題が見つかりません'); return; }
+        lapPool = [...lapOrigPool];
+        lapCurrent = 1;
+        lapWrongIds = [];
+        seqIdx = 0;
+        used = [];
+        // タイマースタート
+        if (typeof window.startQuizTimer === 'function') window.startQuizTimer();
+        // ラップバッジ
+        if (typeof window.showLapBadge === 'function') window.showLapBadge(1, maxLaps);
+    }
+
+    // ---- 現在のプールから出題 ----
+    if (lapPool.length === 0) {
+        // 周回終了判定
+        if (lapWrongIds.length === 0 || (maxLaps !== Infinity && lapCurrent >= maxLaps)) {
+            // 全周回完了 or 全問正解
+            finishQuiz();
+            return;
+        }
+        // 次の周回へ
+        lapCurrent++;
+        lapPool = lapWrongIds.map(q => q);
+        lapWrongIds = [];
+        seqIdx = 0;
+        used = [];
+        if (typeof window.showLapBadge === 'function') window.showLapBadge(lapCurrent, maxLaps);
+        toast('🔄 ' + lapCurrent + '周目 — 間違えた' + lapPool.length + '問に再チャレンジ！');
+    }
 
     let q;
     if (qMode === 'sequential') {
-        if (seqIdx >= pool.length) seqIdx = 0;
-        q = pool[seqIdx]; seqIdx++;
+        if (seqIdx >= lapPool.length) seqIdx = 0;
+        q = lapPool[seqIdx]; seqIdx++;
     } else {
-        const av = pool.filter(p => !used.includes(p.q));
-        if (!av.length) { used = []; q = pool[Math.floor(Math.random() * pool.length)]; }
+        const av = lapPool.filter(p => !used.includes(p.q));
+        if (!av.length) { used = []; q = lapPool[Math.floor(Math.random() * lapPool.length)]; }
         else q = av[Math.floor(Math.random() * av.length)];
         used.push(q.q);
     }
+
+    // 出題済みとしてプールから削除（各周回で1回ずつ出題）
+    const poolIdx = lapPool.indexOf(q);
+    if (poolIdx > -1) lapPool.splice(poolIdx, 1);
+
     curQuiz = q; showQuizUI(q);
 }
 
+function finishQuiz() {
+    if (typeof window.stopQuizTimer === 'function') window.stopQuizTimer();
+    if (typeof window.hideLapBadge === 'function') window.hideLapBadge();
+
+    const rs = document.getElementById('quizResult');
+    const mg = document.getElementById('quizMsg');
+    const od = document.getElementById('quizOptions');
+    const nb = document.getElementById('quizNext');
+
+    od.innerHTML = '';
+    document.getElementById('quizQ').textContent = '';
+    document.getElementById('quizCounter').textContent = 'COMPLETE!';
+
+    const perfect = wc === 0;
+    const rate = tc > 0 ? Math.round((cc / tc) * 100) : 0;
+
+    mg.innerHTML = `<div class="lap-summary">
+        <div class="lap-perfect">${perfect ? '🎊' : rate >= 80 ? '🎉' : rate >= 50 ? '💪' : '🔥'}</div>
+        <div class="lap-summary-title">${perfect ? 'パーフェクト！' : lapCurrent > 1 ? lapCurrent + '周クリア！' : '完了！'}</div>
+        <div class="lap-summary-sub">${perfect ? '全問正解おめでとう！' : rate + '% 正解'}</div>
+        <div class="lap-summary-stats">
+            <div class="lap-summary-stat"><div class="lap-summary-num" style="color:var(--grn)">${cc}</div><div class="lap-summary-label">正解</div></div>
+            <div class="lap-summary-stat"><div class="lap-summary-num" style="color:var(--red)">${wc}</div><div class="lap-summary-label">不正解</div></div>
+            <div class="lap-summary-stat"><div class="lap-summary-num">${tc}</div><div class="lap-summary-label">合計</div></div>
+        </div>
+    </div>`;
+    rs.className = 'quiz-res ' + (perfect ? 'ok' : 'ng');
+
+    nb.textContent = 'もう一度 🔄';
+    nb.disabled = false;
+    nb.onclick = () => {
+        sfx.go();
+        lapOrigPool = []; lapPool = []; lapWrongIds = []; lapCurrent = 1;
+        cc = wc = tc = 0; seqIdx = 0; used = []; updateStats();
+        nb.textContent = '次の問題 →';
+        openQuiz();
+    };
+
+    // 周回完了サウンド
+    sfx.ok(); setTimeout(() => sfx.ok(), 300);
+
+    // Reset lap state for next session
+    lapOrigPool = [];
+}
+
+// タイムアップ時のコールバック
+window.onQuizTimerEnd = function() {
+    toast('⏰ タイムアップ！');
+    sfx.ng();
+    finishQuiz();
+};
+
 function showQuizUI(q) {
-    document.getElementById('quizCounter').textContent = 'QUESTION — ' + curLabel;
+    const remaining = lapPool.length;
+    const totalInRound = remaining + 1; // +1 for current question
+    document.getElementById('quizCounter').textContent = 'QUESTION — ' + curLabel + (lapCurrent > 1 ? '  [' + lapCurrent + '周目]' : '') + '  残り' + (remaining + 1);
     document.getElementById('quizQ').textContent = q.q;
     const od = document.getElementById('quizOptions'); od.innerHTML = '';
     const rs = document.getElementById('quizResult'); rs.className = 'quiz-res';
     const mg = document.getElementById('quizMsg'); mg.innerHTML = '';
     const nb = document.getElementById('quizNext'); nb.disabled = true;
+    nb.textContent = '次の問題 →';
 
     const isEng = sel.some(c => c.startsWith('words_') || c.startsWith('phrases_') || c.startsWith('grammar_'));
     if (isEng) voice.speak(q.q);
@@ -383,7 +521,7 @@ function showQuizUI(q) {
                 answered = true; tc++;
                 const isCorrect = (i === ci);
                 if (isCorrect) { cc++; sfx.ok(); toast('🎉 正解！'); }
-                else { wc++; sfx.ng(); }
+                else { wc++; sfx.ng(); lapWrongIds.push(q); }
                 updateStats(); nb.disabled = false;
                 recordResult(sel, isCorrect);
                 // 正解・不正解どちらでもリアクション送信
@@ -403,7 +541,13 @@ function showQuizUI(q) {
     });
 
     nb.onclick = () => { sfx.click(); openQuiz(); };
-    document.getElementById('quizBack').onclick = () => { sfx.click(); clearSel(); curQuiz = null; renderQuickChips(); hideAll(); };
+    document.getElementById('quizBack').onclick = () => {
+        sfx.click();
+        if (typeof window.stopQuizTimer === 'function') window.stopQuizTimer();
+        if (typeof window.hideLapBadge === 'function') window.hideLapBadge();
+        lapOrigPool = []; lapPool = []; lapWrongIds = []; lapCurrent = 1;
+        clearSel(); curQuiz = null; renderQuickChips(); hideAll();
+    };
     show('quizModal');
 }
 
@@ -788,7 +932,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (el) el.addEventListener('click', () => startQuiz(s, l));
     });
 
-    document.getElementById('startQuizButton').addEventListener('click', () => { sfx.go(); openQuiz(); });
+    document.getElementById('startQuizButton').addEventListener('click', () => {
+        sfx.go();
+        lapOrigPool = []; lapPool = []; lapWrongIds = []; lapCurrent = 1;
+        openQuiz();
+    });
 
     document.getElementById('randomModeBtn').addEventListener('click', () => {
         sfx.click(); qMode = 'random';
