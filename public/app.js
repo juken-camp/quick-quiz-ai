@@ -415,15 +415,37 @@ function renderQuickChips() {
 }
 
 // ---- 浮遊バブル表示 ----
+let activeBubbles = []; // 無制限モードで生きているバブルを管理
+
 function spawnBubble(text, type = 'ai') {
+    const isInfinite = document.getElementById('bubbleInfinite')?.checked;
+
+    // 無制限モードの場合、既存バブルを半透明にフェード
+    if (isInfinite) {
+        activeBubbles.forEach(b => {
+            b.style.transition = 'opacity .4s';
+            b.style.opacity = '0.25';
+        });
+        // 完全に透過したら削除
+        activeBubbles.forEach(b => {
+            setTimeout(() => { if (b.parentNode) b.remove(); }, 3000);
+        });
+        activeBubbles = [];
+    }
+
     const el = document.createElement('div');
     el.className = `float-bubble ${type}`;
     el.innerHTML = text;
-    // 画面下部（AIバーの上）から開始
-    el.style.bottom = '72px';
+    el.style.bottom = '90px';
     document.body.appendChild(el);
-    // アニメーション終了後に削除
-    el.addEventListener('animationend', () => el.remove());
+
+    if (isInfinite) {
+        // 無制限：アニメ後に消えないよう固定表示
+        el.style.animation = 'bubbleIn .3s cubic-bezier(.22,1,.36,1) forwards';
+        activeBubbles.push(el);
+    } else {
+        el.addEventListener('animationend', () => el.remove());
+    }
 }
 
 // ---- 履歴管理 ----
@@ -522,7 +544,7 @@ function getCtx() {
 function getModePrompt() {
     return `【AIの話し方】${aiStylePrompt[aiMode.style]}
 【説明の深さ】${aiDepthPrompt[aiMode.depth]}
-【返答スタイル】最初の返答は3〜5文のコンパクトな会話文で答えてください。箇条書き・見出し・「キーワード：説明」形式などのマークダウン記号は一切使わないこと。もっと聞きたいと言われたら詳しく説明してください。`;
+【返答スタイル】最初の返答は3〜5文のコンパクトな会話文で答えてください。2〜3文ごとに空行（改行2回）を入れて読みやすく段落を分けること。箇条書き・見出し・「キーワード：説明」形式などのマークダウン記号は一切使わないこと。もっと聞きたいと言われたら詳しく説明してください。`;
 }
 
 function md2html(md) {
@@ -612,13 +634,28 @@ function initModeUI() {
     // バブル表示時間スライダー
     const slider = document.getElementById('bubbleDurSlider');
     const durLabel = document.getElementById('bubbleDurLabel');
-    if (slider && durLabel) {
-        slider.addEventListener('input', () => {
+    const infiniteChk = document.getElementById('bubbleInfinite');
+    function applyDuration() {
+        if (infiniteChk && infiniteChk.checked) {
+            durLabel.textContent = '無制限';
+            document.documentElement.style.setProperty('--bubble-duration', '9999s');
+            slider.disabled = true;
+            slider.style.opacity = '0.4';
+        } else {
             const val = parseInt(slider.value);
             durLabel.textContent = val + '秒';
             document.documentElement.style.setProperty('--bubble-duration', val + 's');
-            sfx.click();
-        });
+            slider.disabled = false;
+            slider.style.opacity = '1';
+        }
+    }
+    if (slider && durLabel) {
+        // デフォルト10秒を反映
+        document.documentElement.style.setProperty('--bubble-duration', '10s');
+        slider.addEventListener('input', () => { applyDuration(); sfx.click(); });
+    }
+    if (infiniteChk) {
+        infiniteChk.addEventListener('change', () => { applyDuration(); sfx.click(); });
     }
 }
 
