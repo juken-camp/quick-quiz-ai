@@ -226,6 +226,8 @@ function toast(t) {
 function hideAll() {
     document.querySelectorAll('.overlay').forEach(m => m.classList.remove('show'));
     document.getElementById('quizModal').classList.remove('show');
+    curQuiz = null;
+    renderQuickChips(); // チップを非表示に
     // AI先生バーを常時表示
     const bar = document.getElementById('aiBar');
     if (bar) { bar.style.display = 'flex'; bar.style.visibility = 'visible'; bar.style.opacity = '1'; }
@@ -408,25 +410,26 @@ function renderQuickChips() {
     if (!el) return;
     el.innerHTML = '';
 
-    const chips = curQuiz
-        ? [
-            '教えて',
-            '「' + curQuiz.opts[curQuiz.ans] + '」って何？',
-            'どう覚える？'
-          ]
-        : defaultChips;
+    // 問題を解いていない時はチップを非表示
+    if (!curQuiz) {
+        el.classList.remove('visible');
+        return;
+    }
+
+    const chips = [
+        '教えて',
+        '「' + curQuiz.opts[curQuiz.ans] + '」って何？',
+        'どう覚える？'
+    ];
 
     chips.forEach(text => {
         const b = document.createElement('button');
         b.className = 'qchip';
         b.textContent = text;
-        b.onclick = () => {
-            sendChat(text);
-        };
+        b.onclick = () => { sendChat(text); };
         el.appendChild(b);
     });
 
-    // 少し遅らせて表示（ページ読み込み直後の飛び出しを防ぐ）
     requestAnimationFrame(() => el.classList.add('visible'));
 }
 
