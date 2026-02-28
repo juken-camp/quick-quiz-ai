@@ -287,21 +287,112 @@
 
         .spacer{height:80px}
 
-        /* 弱点トラッカー */
-        .weak-section{margin-top:14px;background:var(--wh);border-radius:14px;padding:14px 14px 10px;box-shadow:var(--shadow-sm);border:1.5px solid var(--ln)}
-        .weak-title{font-family:var(--fd);font-weight:700;font-size:13px;letter-spacing:-.01em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-        .weak-item{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--ft)}
-        .weak-item:last-of-type{border-bottom:none}
-        .weak-rank{font-size:18px;flex-shrink:0}
-        .weak-info{flex:1;min-width:0}
-        .weak-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px}
-        .weak-bar-wrap{background:var(--ft);border-radius:4px;height:5px;overflow:hidden}
-        .weak-bar{background:linear-gradient(90deg,var(--red),#ff8a93);height:100%;border-radius:4px;transition:width .6s cubic-bezier(.22,1,.36,1)}
-        .weak-pct{font-family:var(--fm);font-size:11px;font-weight:600;color:var(--red);text-align:center;flex-shrink:0;line-height:1.3}
-        .weak-pct small{font-size:9px;color:var(--mid);font-weight:400}
-        .weak-empty{font-size:12px;color:var(--soft);padding:4px 0 8px}
-        .weak-reset-btn{margin-top:10px;font-size:10px;font-family:var(--fm);letter-spacing:.1em;color:var(--soft);background:none;border:none;cursor:pointer;padding:0}
-        @media(hover:hover){.weak-reset-btn:hover{color:var(--red)}}
+        /* 成績トラッカー */
+        .tracker-section{margin-top:14px;background:var(--wh);border-radius:14px;padding:14px 14px 10px;box-shadow:var(--shadow-sm);border:1.5px solid var(--ln)}
+        .tracker-title{font-family:var(--fd);font-weight:700;font-size:13px;letter-spacing:-.01em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+        .tracker-item{display:flex;align-items:center;gap:10px;padding:8px 10px;margin:0 -10px;border-radius:10px;
+            border-bottom:1px solid var(--ft);cursor:pointer;transition:all .15s;border:1.5px solid transparent}
+        .tracker-item:last-of-type{border-bottom-color:transparent}
+        @media(hover:hover){.tracker-item:hover{background:var(--ac-bg);border-color:var(--ac2)}}
+        .tracker-item:active{opacity:.8;transform:scale(.98)}
+        .tracker-rank{font-size:18px;flex-shrink:0}
+        .tracker-info{flex:1;min-width:0}
+        .tracker-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px}
+        .tracker-bar-wrap{background:var(--ft);border-radius:4px;height:5px;overflow:hidden}
+        .tracker-bar{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.22,1,.36,1)}
+        .tracker-bar.weak{background:linear-gradient(90deg,var(--red),#ff8a93)}
+        .tracker-bar.strong{background:linear-gradient(90deg,var(--grn),#5ae4a7)}
+        .tracker-pct{font-family:var(--fm);font-size:11px;font-weight:600;text-align:center;flex-shrink:0;line-height:1.3}
+        .tracker-pct.weak{color:var(--red)}
+        .tracker-pct.strong{color:var(--grn)}
+        .tracker-pct small{font-size:9px;color:var(--mid);font-weight:400}
+        .tracker-arrow{font-size:12px;color:var(--soft);flex-shrink:0;transition:all .15s}
+        @media(hover:hover){.tracker-item:hover .tracker-arrow{color:var(--ac);transform:translateX(2px)}}
+        .tracker-empty{font-size:12px;color:var(--soft);padding:4px 0 8px}
+        .tracker-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+        .tracker-reset-btn{font-size:10px;font-family:var(--fm);letter-spacing:.1em;color:var(--soft);background:none;border:none;cursor:pointer;padding:0}
+        @media(hover:hover){.tracker-reset-btn:hover{color:var(--red)}}
+        .tracker-detail-btn{font-size:11px;font-family:var(--fb);font-weight:600;color:var(--ac);
+            background:var(--ac-bg);border:1px solid rgba(108,99,255,.15);border-radius:16px;padding:4px 12px;cursor:pointer;transition:all .15s}
+        @media(hover:hover){.tracker-detail-btn:hover{background:var(--ac);color:var(--wh)}}
+        .tracker-detail-btn:active{transform:scale(.95)}
+
+        /* ===== 成績詳細オーバーレイ ===== */
+        .stats-detail-ov{display:none;position:fixed;inset:0;z-index:600;
+            background:rgba(13,13,15,.4);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+            align-items:flex-end;justify-content:center}
+        .stats-detail-ov.show{display:flex;animation:fi .2s}
+        .stats-detail-box{background:var(--wh);border-radius:24px 24px 0 0;width:100%;max-width:480px;
+            max-height:85vh;display:flex;flex-direction:column;animation:su .3s cubic-bezier(.22,1,.36,1)}
+        .stats-detail-hd{display:flex;align-items:center;justify-content:space-between;
+            padding:16px 20px 12px;border-bottom:1px solid var(--ln);flex-shrink:0}
+        .stats-detail-title{font-family:var(--fd);font-weight:700;font-size:15px}
+        .stats-detail-close{background:var(--ft);border:none;border-radius:50%;width:28px;height:28px;
+            font-size:14px;cursor:pointer;color:var(--mid);display:flex;align-items:center;justify-content:center}
+        .stats-detail-body{flex:1;overflow-y:auto;padding:16px 20px 28px}
+        .stats-detail-section{margin-bottom:20px}
+        .stats-detail-section-title{font-family:var(--fd);font-weight:700;font-size:13px;letter-spacing:-.01em;
+            margin-bottom:8px;display:flex;align-items:center;gap:6px;padding-bottom:6px;border-bottom:1px solid var(--ft)}
+        .stats-detail-list{display:flex;flex-direction:column;gap:2px}
+        .stats-summary-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
+        .stats-summary-card{background:var(--ft);border-radius:12px;padding:10px 8px;text-align:center}
+        .stats-summary-num{font-family:var(--fd);font-size:22px;font-weight:800;letter-spacing:-.03em}
+        .stats-summary-label{font-family:var(--fm);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);margin-top:2px}
+
+        /* ===== タイマー & 周回設定 ===== */
+        .setting-card{background:var(--wh);border:1.5px solid var(--ln);border-radius:14px;padding:14px;margin-top:12px;box-shadow:var(--shadow-sm)}
+        .setting-card-title{font-family:var(--fd);font-weight:700;font-size:13px;letter-spacing:-.01em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+        .timer-grid{display:grid;grid-template-columns:1fr 12px 1fr;gap:0;align-items:center}
+        .timer-input-wrap{display:flex;flex-direction:column;align-items:center;gap:2px}
+        .timer-input-label{font-family:var(--fm);font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:var(--soft)}
+        .timer-input{width:100%;text-align:center;font-family:var(--fm);font-size:22px;font-weight:600;
+            background:var(--ft);border:1.5px solid var(--ln);border-radius:10px;padding:8px 4px;
+            color:var(--bk);outline:none;transition:all .2s;-moz-appearance:textfield}
+        .timer-input::-webkit-outer-spin-button,.timer-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+        .timer-input:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(108,99,255,.1)}
+        .timer-colon{font-family:var(--fm);font-size:22px;font-weight:700;color:var(--mid);text-align:center;padding-top:14px}
+        .timer-presets{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+        .timer-preset{font-family:var(--fm);font-size:10px;font-weight:500;padding:4px 10px;
+            border:1.5px solid var(--ln);border-radius:16px;background:var(--wh);
+            color:var(--mid);cursor:pointer;transition:all .15s;white-space:nowrap}
+        .timer-preset.active{background:var(--ac);color:var(--wh);border-color:var(--ac);box-shadow:var(--glow)}
+        @media(hover:hover){.timer-preset:hover{border-color:var(--ac2);color:var(--ac)}}
+        .timer-toggle-row{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+        .timer-toggle-label{font-size:12px;color:var(--mid);font-weight:500}
+
+        .lap-row{display:flex;align-items:center;gap:8px;margin-top:4px}
+        .lap-btn{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--ln);background:var(--wh);
+            font-size:16px;font-weight:700;color:var(--bk);cursor:pointer;transition:all .15s;
+            display:flex;align-items:center;justify-content:center;font-family:var(--fm)}
+        @media(hover:hover){.lap-btn:hover{border-color:var(--ac);color:var(--ac);background:var(--ac-bg)}}
+        .lap-btn:active{transform:scale(.92)}
+        .lap-btn:disabled{opacity:.3;cursor:default;transform:none}
+        .lap-display{font-family:var(--fm);font-size:28px;font-weight:800;color:var(--bk);min-width:40px;text-align:center;letter-spacing:-.02em}
+        .lap-display small{font-size:12px;font-weight:500;color:var(--soft);letter-spacing:0}
+        .lap-desc{font-size:11px;color:var(--soft);margin-top:6px;line-height:1.4}
+
+        /* ===== クイズ中タイマーHUD ===== */
+        .quiz-hud{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px}
+        .quiz-timer{display:flex;align-items:center;gap:6px;font-family:var(--fm);font-size:13px;font-weight:600;
+            color:var(--ac);padding:5px 12px;background:var(--ac-bg);border-radius:20px;border:1px solid rgba(108,99,255,.15)}
+        .quiz-timer.warning{color:var(--red);background:var(--red-bg);border-color:rgba(255,71,87,.2);animation:timerPulse 1s infinite}
+        .quiz-timer.expired{color:var(--red);background:var(--red-bg);border-color:var(--red)}
+        @keyframes timerPulse{0%,100%{opacity:1}50%{opacity:.6}}
+        .quiz-timer-icon{font-size:14px}
+        .quiz-lap-badge{font-family:var(--fm);font-size:10px;font-weight:600;letter-spacing:.08em;
+            padding:4px 10px;border-radius:16px;background:var(--ft);border:1px solid var(--ln);color:var(--mid)}
+        .quiz-lap-badge .current-lap{color:var(--ac);font-weight:800}
+
+        /* ===== 周回完了サマリー ===== */
+        .lap-summary{background:var(--wh);border:1.5px solid var(--ln);border-radius:14px;padding:16px;margin-top:12px;
+            box-shadow:var(--shadow-sm);text-align:center}
+        .lap-summary-title{font-family:var(--fd);font-weight:800;font-size:18px;margin-bottom:4px}
+        .lap-summary-sub{font-size:12px;color:var(--mid);margin-bottom:12px}
+        .lap-summary-stats{display:flex;justify-content:center;gap:20px;margin-bottom:12px}
+        .lap-summary-stat{text-align:center}
+        .lap-summary-num{font-family:var(--fd);font-size:26px;font-weight:800}
+        .lap-summary-label{font-family:var(--fm);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft)}
+        .lap-perfect{font-size:32px;margin-bottom:8px}
 
         @media(max-width:640px){.shell{padding:0 16px}.header{padding:28px 0 8px}.header-logo{font-size:26px}.quiz-q{font-size:17px}.chat-ms{max-height:32vh}}
         ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--ac2);border-radius:3px;opacity:.5}
@@ -317,11 +408,14 @@
             <div class="header-sub">JUKEN CAMP × AI</div>
             <div class="header-line"></div>
         </div>
-        <!-- 弱点トラッカー -->
-        <div class="weak-section">
-            <div class="weak-title">📊 あなたの弱点TOP3</div>
-            <div id="weakTopList"><p class="weak-empty">まだデータがないよ。問題を解いてみよう！</p></div>
-            <button class="weak-reset-btn" onclick="if(confirm('弱点データをリセットしますか？')){weakTracker={};saveTracker();renderWeakTop();}">リセット</button>
+        <!-- 成績トラッカー -->
+        <div class="tracker-section">
+            <div class="tracker-title">📊 ニガテ克服リスト TOP3</div>
+            <div id="weakTopList"><p class="tracker-empty">まだデータがないよ。問題を解いてみよう！</p></div>
+            <div class="tracker-footer">
+                <button class="tracker-reset-btn" onclick="if(confirm('成績データをリセットしますか？')){weakTracker={};saveTracker();renderWeakTop();}">リセット</button>
+                <button class="tracker-detail-btn" id="openStatsDetail">📈 詳しく見る</button>
+            </div>
         </div>
         <div style="margin-top:14px">
             <div class="label">Select Subject</div>
@@ -352,6 +446,49 @@
             <button id="randomModeBtn" class="mode-btn mode-active">🎲 ランダム</button>
             <button id="sequentialModeBtn" class="mode-btn">📋 順番通り</button>
         </div>
+
+        <!-- タイマー設定 -->
+        <div class="setting-card">
+            <div class="setting-card-title">⏱️ タイマー</div>
+            <div class="timer-grid">
+                <div class="timer-input-wrap">
+                    <input type="number" id="timerMin" class="timer-input" value="3" min="0" max="99" inputmode="numeric">
+                    <div class="timer-input-label">min</div>
+                </div>
+                <div class="timer-colon">:</div>
+                <div class="timer-input-wrap">
+                    <input type="number" id="timerSec" class="timer-input" value="00" min="0" max="59" step="5" inputmode="numeric">
+                    <div class="timer-input-label">sec</div>
+                </div>
+            </div>
+            <div class="timer-presets">
+                <button class="timer-preset" data-time="60">1分</button>
+                <button class="timer-preset active" data-time="180">3分</button>
+                <button class="timer-preset" data-time="300">5分</button>
+                <button class="timer-preset" data-time="600">10分</button>
+                <button class="timer-preset" data-time="0">∞ 無制限</button>
+            </div>
+            <div class="timer-toggle-row">
+                <span class="timer-toggle-label">タイムアップで自動終了</span>
+                <label class="toggle-wrap">
+                    <input type="checkbox" id="timerAutoEnd" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- 周回（反復）設定 -->
+        <div class="setting-card">
+            <div class="setting-card-title">🔄 反復モード <span style="font-size:10px;font-weight:400;color:var(--soft);margin-left:4px">— 間違えた問題を繰り返す</span></div>
+            <div class="lap-row">
+                <button class="lap-btn" id="lapMinus" disabled>−</button>
+                <div class="lap-display" id="lapDisplay">1<small>周</small></div>
+                <button class="lap-btn" id="lapPlus">+</button>
+                <button class="timer-preset" id="lapInfinite" style="margin-left:auto">∞ 全問正解まで</button>
+            </div>
+            <div class="lap-desc" id="lapDesc">1周のみ — 全問を1回通して終了</div>
+        </div>
+
         <button id="startQuizButton" class="btn btn-bk btn-full" style="margin-top:16px">スタート →</button>
         <div class="spacer"></div>
     </div>
@@ -389,9 +526,56 @@
 <div id="englishPhrasesModal" class="overlay"><div class="overlay-inner"><div class="label-lg">💬 英熟語</div><div class="label-desc">単元を選択（複数可）</div><div class="cat-list" id="englishPhrasesCategories"></div><div style="margin-top:24px;text-align:center"><button id="startEnglishPhrasesQuiz" class="btn btn-bk" disabled>決定 →</button></div><div style="margin-top:12px"><button class="back-link" onclick="goBackToEnglish()">← 英語に戻る</button></div></div></div>
 <div id="englishGrammarModal" class="overlay"><div class="overlay-inner"><div class="label-lg">📘 語形変化</div><div class="label-desc">単元を選択（複数可）</div><div class="cat-list" id="englishGrammarCategories"></div><div style="margin-top:24px;text-align:center"><button id="startEnglishGrammarQuiz" class="btn btn-bk" disabled>決定 →</button></div><div style="margin-top:12px"><button class="back-link" onclick="goBackToEnglish()">← 英語に戻る</button></div></div></div>
 
+<!-- 成績詳細オーバーレイ -->
+<div class="stats-detail-ov" id="statsDetailOv">
+    <div class="stats-detail-box">
+        <div class="stats-detail-hd">
+            <div class="stats-detail-title">📈 成績レポート</div>
+            <button class="stats-detail-close" id="statsDetailClose">✕</button>
+        </div>
+        <div class="stats-detail-body">
+            <div class="stats-summary-row" id="statsSummaryRow">
+                <div class="stats-summary-card">
+                    <div class="stats-summary-num" id="statsTotalAnswered">0</div>
+                    <div class="stats-summary-label">Total</div>
+                </div>
+                <div class="stats-summary-card">
+                    <div class="stats-summary-num" id="statsOverallRate" style="color:var(--ac)">—%</div>
+                    <div class="stats-summary-label">正答率</div>
+                </div>
+                <div class="stats-summary-card">
+                    <div class="stats-summary-num" id="statsUnitCount">0</div>
+                    <div class="stats-summary-label">単元数</div>
+                </div>
+            </div>
+            <div class="stats-detail-section">
+                <div class="stats-detail-section-title">🔥 ニガテ — 伸びしろランキング</div>
+                <div class="stats-detail-list" id="statsWeakList">
+                    <p class="tracker-empty">データなし</p>
+                </div>
+            </div>
+            <div class="stats-detail-section">
+                <div class="stats-detail-section-title">💪 トクイ — 自信ランキング</div>
+                <div class="stats-detail-list" id="statsStrongList">
+                    <p class="tracker-empty">データなし</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- QUIZ SCREEN -->
 <div id="quizModal" class="quiz-ov">
     <div class="quiz-in">
+        <div class="quiz-hud">
+            <div class="quiz-timer" id="quizTimer" style="display:none">
+                <span class="quiz-timer-icon">⏱️</span>
+                <span id="quizTimerDisplay">3:00</span>
+            </div>
+            <div class="quiz-lap-badge" id="quizLapBadge" style="display:none">
+                ROUND <span class="current-lap" id="quizCurrentLap">1</span> / <span id="quizMaxLap">1</span>
+            </div>
+        </div>
         <div class="quiz-cnt" id="quizCounter">QUESTION</div>
         <div class="quiz-q" id="quizQ"></div>
         <div class="quiz-opts" id="quizOptions"></div>
@@ -480,6 +664,218 @@
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<script>
+/* ===== Timer & Lap Settings UI ===== */
+(function(){
+    /* --- Timer --- */
+    const minEl=document.getElementById('timerMin');
+    const secEl=document.getElementById('timerSec');
+    const presets=document.querySelectorAll('.timer-preset[data-time]');
+    const autoEndTog=document.getElementById('timerAutoEnd');
+
+    function padZ(v){return String(v).padStart(2,'0')}
+    function syncFromInputs(){
+        let m=parseInt(minEl.value)||0, s=parseInt(secEl.value)||0;
+        if(s>59){s=59;secEl.value=padZ(s)}
+        if(m>99){m=99;minEl.value=m}
+        const total=m*60+s;
+        presets.forEach(p=>p.classList.toggle('active',parseInt(p.dataset.time)===total));
+        updateQuizSettings();
+    }
+    minEl.addEventListener('input',syncFromInputs);
+    secEl.addEventListener('input',syncFromInputs);
+    minEl.addEventListener('blur',()=>{if(!minEl.value)minEl.value=0});
+    secEl.addEventListener('blur',()=>{secEl.value=padZ(parseInt(secEl.value)||0)});
+
+    presets.forEach(p=>{
+        p.addEventListener('click',()=>{
+            const t=parseInt(p.dataset.time);
+            const m=Math.floor(t/60), s=t%60;
+            minEl.value=m; secEl.value=padZ(s);
+            presets.forEach(pp=>pp.classList.remove('active'));
+            p.classList.add('active');
+            updateQuizSettings();
+        });
+    });
+
+    /* --- Lap / Repeat --- */
+    const lapDisplay=document.getElementById('lapDisplay');
+    const lapDesc=document.getElementById('lapDesc');
+    const lapMinus=document.getElementById('lapMinus');
+    const lapPlus=document.getElementById('lapPlus');
+    const lapInfBtn=document.getElementById('lapInfinite');
+    let lapCount=1, lapInfinite=false;
+
+    function renderLap(){
+        if(lapInfinite){
+            lapDisplay.innerHTML='∞';
+            lapDesc.textContent='全問正解するまで何度でも繰り返す';
+            lapInfBtn.classList.add('active');
+            lapMinus.disabled=true;
+            lapPlus.disabled=true;
+        }else{
+            lapDisplay.innerHTML=lapCount+'<small>周</small>';
+            lapMinus.disabled=lapCount<=1;
+            lapPlus.disabled=lapCount>=10;
+            lapInfBtn.classList.remove('active');
+            const descs={
+                1:'1周のみ — 全問を1回通して終了',
+                2:'間違えた問題だけ2周目に再チャレンジ',
+                3:'最大3周 — 苦手を集中的に潰す！'
+            };
+            lapDesc.textContent=descs[lapCount]||(lapCount+'周まで反復 — 弱点を徹底攻略！');
+        }
+        updateQuizSettings();
+    }
+    lapMinus.addEventListener('click',()=>{if(lapCount>1){lapCount--;lapInfinite=false;renderLap()}});
+    lapPlus.addEventListener('click',()=>{if(lapCount<10){lapCount++;lapInfinite=false;renderLap()}});
+    lapInfBtn.addEventListener('click',()=>{lapInfinite=!lapInfinite;if(!lapInfinite&&lapCount<1)lapCount=1;renderLap()});
+    renderLap();
+
+    /* --- Expose to window for app.js --- */
+    function updateQuizSettings(){
+        const m=parseInt(minEl.value)||0, s=parseInt(secEl.value)||0;
+        window.quizSettings=Object.assign(window.quizSettings||{},{
+            timerSeconds:m*60+s,
+            timerAutoEnd:autoEndTog.checked,
+            lapCount:lapInfinite?Infinity:lapCount,
+            lapInfinite:lapInfinite
+        });
+    }
+    autoEndTog.addEventListener('change',updateQuizSettings);
+    updateQuizSettings();
+
+    /* --- Quiz Timer Runtime --- */
+    let _timer=null, _remaining=0;
+    window.startQuizTimer=function(){
+        const cfg=window.quizSettings||{};
+        const timerEl=document.getElementById('quizTimer');
+        const dispEl=document.getElementById('quizTimerDisplay');
+        clearInterval(_timer);
+        if(!cfg.timerSeconds||cfg.timerSeconds<=0){timerEl.style.display='none';return}
+        _remaining=cfg.timerSeconds;
+        timerEl.style.display='flex';
+        timerEl.classList.remove('warning','expired');
+        function render(){
+            const m=Math.floor(_remaining/60),s=_remaining%60;
+            dispEl.textContent=m+':'+padZ(s);
+            timerEl.classList.toggle('warning',_remaining<=30&&_remaining>0);
+        }
+        render();
+        _timer=setInterval(()=>{
+            _remaining--;
+            if(_remaining<=0){
+                _remaining=0;render();
+                clearInterval(_timer);
+                timerEl.classList.remove('warning');
+                timerEl.classList.add('expired');
+                dispEl.textContent="0:00 TIME UP!";
+                if(cfg.timerAutoEnd&&typeof window.onQuizTimerEnd==='function'){
+                    window.onQuizTimerEnd();
+                }
+            }else{render()}
+        },1000);
+    };
+    window.stopQuizTimer=function(){clearInterval(_timer)};
+    window.getQuizTimeRemaining=function(){return _remaining};
+
+    /* --- Lap badge runtime --- */
+    window.showLapBadge=function(current,max){
+        const badge=document.getElementById('quizLapBadge');
+        const maxLaps=window.quizSettings?.lapCount;
+        if(!maxLaps||maxLaps<=1){badge.style.display='none';return}
+        badge.style.display='';
+        document.getElementById('quizCurrentLap').textContent=current||1;
+        document.getElementById('quizMaxLap').textContent=maxLaps===Infinity?'∞':max||maxLaps;
+    };
+    window.hideLapBadge=function(){document.getElementById('quizLapBadge').style.display='none'};
+})();
+
+/* ===== Stats Detail Overlay ===== */
+(function(){
+    const ov=document.getElementById('statsDetailOv');
+    const openBtn=document.getElementById('openStatsDetail');
+    const closeBtn=document.getElementById('statsDetailClose');
+
+    openBtn.addEventListener('click',()=>{
+        renderStatsDetail();
+        ov.classList.add('show');
+    });
+    closeBtn.addEventListener('click',()=>ov.classList.remove('show'));
+    ov.addEventListener('click',(e)=>{if(e.target===ov)ov.classList.remove('show')});
+
+    function getTrackerData(){
+        try{return JSON.parse(localStorage.getItem('weakTracker'))||{}}catch(e){return{}}
+    }
+
+    function sortByRate(data,ascending){
+        return Object.entries(data).map(([key,v])=>{
+            const total=(v.correct||0)+(v.wrong||0);
+            const rate=total>0?((v.correct||0)/total*100):null;
+            return{key,name:v.name||key,correct:v.correct||0,wrong:v.wrong||0,total,rate};
+        }).filter(d=>d.total>0).sort((a,b)=>{
+            if(ascending) return (a.rate??999)-(b.rate??999);
+            return (b.rate??-1)-(a.rate??-1);
+        });
+    }
+
+    function makeTrackerItem(d,type,rank){
+        const pct=d.rate!==null?Math.round(d.rate):'—';
+        const medals=['🥇','🥈','🥉'];
+        const rankIcon=rank<3?medals[rank]:(rank+1+'.');
+        const barClass=type==='weak'?'weak':'strong';
+        const pctClass=type==='weak'?'weak':'strong';
+        const div=document.createElement('div');
+        div.className='tracker-item';
+        div.setAttribute('data-unit-key',d.key);
+        div.innerHTML=
+            '<div class="tracker-rank">'+rankIcon+'</div>'+
+            '<div class="tracker-info">'+
+                '<div class="tracker-name">'+d.name+'</div>'+
+                '<div class="tracker-bar-wrap"><div class="tracker-bar '+barClass+'" style="width:'+(pct==='—'?0:pct)+'%"></div></div>'+
+            '</div>'+
+            '<div class="tracker-pct '+pctClass+'">'+pct+'%<br><small>'+d.correct+'/'+d.total+'</small></div>'+
+            '<div class="tracker-arrow">→</div>';
+        div.addEventListener('click',()=>{
+            if(typeof window.startQuizFromTracker==='function'){
+                window.startQuizFromTracker(d.key);
+                ov.classList.remove('show');
+            }
+        });
+        return div;
+    }
+
+    function renderStatsDetail(){
+        const data=getTrackerData();
+        const weakList=document.getElementById('statsWeakList');
+        const strongList=document.getElementById('statsStrongList');
+        const weak=sortByRate(data,true);
+        const strong=sortByRate(data,false);
+
+        // Summary
+        let totalQ=0,totalC=0,units=0;
+        Object.values(data).forEach(v=>{
+            const t=(v.correct||0)+(v.wrong||0);
+            if(t>0){totalQ+=t;totalC+=(v.correct||0);units++}
+        });
+        document.getElementById('statsTotalAnswered').textContent=totalQ;
+        document.getElementById('statsOverallRate').textContent=totalQ>0?Math.round(totalC/totalQ*100)+'%':'—%';
+        document.getElementById('statsUnitCount').textContent=units;
+
+        // Weak list
+        weakList.innerHTML='';
+        if(weak.length===0){weakList.innerHTML='<p class="tracker-empty">データなし</p>';
+        }else{weak.forEach((d,i)=>weakList.appendChild(makeTrackerItem(d,'weak',i)))}
+
+        // Strong list
+        strongList.innerHTML='';
+        if(strong.length===0){strongList.innerHTML='<p class="tracker-empty">データなし</p>';
+        }else{strong.forEach((d,i)=>strongList.appendChild(makeTrackerItem(d,'strong',i)))}
+    }
+
+    /* --- app.js now handles renderWeakTop with new tracker classes natively --- */
+})();
+</script>
 <script src="app.js"></script>
 </body>
 </html>
