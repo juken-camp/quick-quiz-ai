@@ -383,7 +383,7 @@ function showQuizUI(q) {
 }
 
 // ---- クイックチップ ----
-const defaultChips = ['教えて', 'どう覚える？', 'テストで出る？', 'もっと詳しく'];
+const defaultChips = ['教えて', 'どう覚える？', 'もっと詳しく'];
 
 function renderQuickChips() {
     const el = document.getElementById('quickChips');
@@ -394,9 +394,7 @@ function renderQuickChips() {
         ? [
             '教えて',
             '「' + curQuiz.opts[curQuiz.ans] + '」って何？',
-            'どう覚える？',
-            'テストで出る？',
-            '間違えた理由は？'
+            'どう覚える？'
           ]
         : defaultChips;
 
@@ -412,6 +410,20 @@ function renderQuickChips() {
 
     // 少し遅らせて表示（ページ読み込み直後の飛び出しを防ぐ）
     requestAnimationFrame(() => el.classList.add('visible'));
+}
+
+// ---- テキスト改行変換 ----
+function formatBubbleText(text) {
+    // 
+
+ → 段落スペース、
+ → 改行
+    return text
+        .replace(/
+
++/g, '<br><br>')
+        .replace(/
+/g, '<br>');
 }
 
 // ---- 浮遊バブル表示 ----
@@ -435,7 +447,7 @@ function spawnBubble(text, type = 'ai') {
 
     const el = document.createElement('div');
     el.className = `float-bubble ${type}`;
-    el.innerHTML = text;
+    el.innerHTML = type === 'user' ? text : formatBubbleText(text);
     el.style.bottom = '90px';
     document.body.appendChild(el);
 
@@ -544,7 +556,7 @@ function getCtx() {
 function getModePrompt() {
     return `【AIの話し方】${aiStylePrompt[aiMode.style]}
 【説明の深さ】${aiDepthPrompt[aiMode.depth]}
-【返答スタイル】最初の返答は3〜5文のコンパクトな会話文で答えてください。2〜3文ごとに空行（改行2回）を入れて読みやすく段落を分けること。箇条書き・見出し・「キーワード：説明」形式などのマークダウン記号は一切使わないこと。もっと聞きたいと言われたら詳しく説明してください。`;
+【返答スタイル】3〜5文の会話文で答えてください。必ず2文ごとに改行を2回（空行）入れて段落を分けること。これは絶対に守ること。箇条書き・見出し・記号（**、##、・など）は一切使わないこと。`;
 }
 
 function md2html(md) {
