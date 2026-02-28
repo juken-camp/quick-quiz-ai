@@ -101,10 +101,7 @@
         .stat-num{font-family:var(--fd);font-size:24px;font-weight:800;letter-spacing:-.03em}
         .stat-label{font-family:var(--fm);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--soft);margin-top:3px}
 
-        /* Mode (quiz mode toggle) */
-        .mode-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:12px 0}
-        .mode-btn{background:var(--wh);border:1.5px solid var(--ln);border-radius:9px;padding:10px;font-family:var(--fb);
-            font-size:12px;font-weight:500;color:var(--mid);cursor:pointer;transition:all .15s;text-align:center;box-shadow:var(--shadow-sm)}
+        /* Mode (quiz mode toggle) — now inside setting-card, see .mode-toggle */
         .mode-btn.active{background:var(--ac-bg);border-color:var(--ac);color:var(--ac);font-weight:700}
 
         /* Quiz overlay */
@@ -339,37 +336,57 @@
         .stats-summary-num{font-family:var(--fd);font-size:22px;font-weight:800;letter-spacing:-.03em}
         .stats-summary-label{font-family:var(--fm);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);margin-top:2px}
 
-        /* ===== タイマー & 周回設定 ===== */
-        .setting-card{background:var(--wh);border:1.5px solid var(--ln);border-radius:14px;padding:14px;margin-top:12px;box-shadow:var(--shadow-sm)}
+        /* ===== ゲーム設定カード（統一デザイン） ===== */
+        .setting-card{background:var(--wh);border:1.5px solid var(--ln);border-radius:14px;padding:14px;margin-top:10px;box-shadow:var(--shadow-sm)}
         .setting-card-title{font-family:var(--fd);font-weight:700;font-size:13px;letter-spacing:-.01em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-        .timer-grid{display:grid;grid-template-columns:1fr 12px 1fr;gap:0;align-items:center}
-        .timer-input-wrap{display:flex;flex-direction:column;align-items:center;gap:2px}
-        .timer-input-label{font-family:var(--fm);font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:var(--soft)}
-        .timer-input{width:100%;text-align:center;font-family:var(--fm);font-size:22px;font-weight:600;
-            background:var(--ft);border:1.5px solid var(--ln);border-radius:10px;padding:8px 4px;
-            color:var(--bk);outline:none;transition:all .2s;-moz-appearance:textfield}
-        .timer-input::-webkit-outer-spin-button,.timer-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-        .timer-input:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(108,99,255,.1)}
-        .timer-colon{font-family:var(--fm);font-size:22px;font-weight:700;color:var(--mid);text-align:center;padding-top:14px}
-        .timer-presets{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+        .setting-card-title .setting-card-sub{font-size:10px;font-weight:400;color:var(--soft);margin-left:4px}
+
+        /* Mode toggle inside card */
+        .mode-toggle{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+        .mode-toggle-btn{background:var(--ft);border:1.5px solid var(--ln);border-radius:10px;padding:10px 8px;
+            font-family:var(--fb);font-size:12px;font-weight:500;color:var(--mid);cursor:pointer;
+            transition:all .15s;text-align:center}
+        .mode-toggle-btn.active{background:var(--ac-bg);border-color:var(--ac);color:var(--ac);font-weight:700}
+        @media(hover:hover){.mode-toggle-btn:hover:not(.active){border-color:var(--ac2);color:var(--ac)}}
+        .mode-toggle-btn:active{transform:scale(.97)}
+
+        /* Timer spinner */
+        .timer-spinner-grid{display:grid;grid-template-columns:1fr 16px 1fr;gap:0;align-items:center}
+        .timer-spinner{display:flex;flex-direction:column;align-items:center;gap:0;user-select:none}
+        .timer-spin-btn{width:44px;height:28px;border:none;background:transparent;
+            font-size:14px;color:var(--soft);cursor:pointer;transition:all .12s;
+            display:flex;align-items:center;justify-content:center;border-radius:8px}
+        @media(hover:hover){.timer-spin-btn:hover{background:var(--ac-bg);color:var(--ac)}}
+        .timer-spin-btn:active{transform:scale(.88);color:var(--ac)}
+        .timer-spin-value{font-family:var(--fm);font-size:28px;font-weight:700;color:var(--bk);
+            width:56px;text-align:center;line-height:1;padding:4px 0;
+            background:var(--ft);border:1.5px solid var(--ln);border-radius:10px;
+            transition:border-color .15s;cursor:ns-resize;touch-action:none}
+        .timer-spin-value.dragging{border-color:var(--ac);box-shadow:0 0 0 3px rgba(108,99,255,.1)}
+        .timer-spin-label{font-family:var(--fm);font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:var(--soft);margin-top:3px}
+        .timer-colon{font-family:var(--fm);font-size:28px;font-weight:700;color:var(--ln);text-align:center;padding-top:0}
+        .timer-presets{display:flex;gap:5px;margin-top:10px;flex-wrap:wrap}
         .timer-preset{font-family:var(--fm);font-size:10px;font-weight:500;padding:4px 10px;
             border:1.5px solid var(--ln);border-radius:16px;background:var(--wh);
             color:var(--mid);cursor:pointer;transition:all .15s;white-space:nowrap}
         .timer-preset.active{background:var(--ac);color:var(--wh);border-color:var(--ac);box-shadow:var(--glow)}
-        @media(hover:hover){.timer-preset:hover{border-color:var(--ac2);color:var(--ac)}}
-        .timer-toggle-row{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+        @media(hover:hover){.timer-preset:hover:not(.active){border-color:var(--ac2);color:var(--ac)}}
+        .timer-toggle-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px;
+            padding-top:8px;border-top:1px solid var(--ft)}
         .timer-toggle-label{font-size:12px;color:var(--mid);font-weight:500}
 
-        .lap-row{display:flex;align-items:center;gap:8px;margin-top:4px}
-        .lap-btn{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--ln);background:var(--wh);
+        /* Lap */
+        .lap-row{display:flex;align-items:center;gap:10px;margin-top:4px}
+        .lap-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--ln);background:var(--ft);
             font-size:16px;font-weight:700;color:var(--bk);cursor:pointer;transition:all .15s;
             display:flex;align-items:center;justify-content:center;font-family:var(--fm)}
         @media(hover:hover){.lap-btn:hover{border-color:var(--ac);color:var(--ac);background:var(--ac-bg)}}
-        .lap-btn:active{transform:scale(.92)}
-        .lap-btn:disabled{opacity:.3;cursor:default;transform:none}
-        .lap-display{font-family:var(--fm);font-size:28px;font-weight:800;color:var(--bk);min-width:40px;text-align:center;letter-spacing:-.02em}
-        .lap-display small{font-size:12px;font-weight:500;color:var(--soft);letter-spacing:0}
-        .lap-desc{font-size:11px;color:var(--soft);margin-top:6px;line-height:1.4}
+        .lap-btn:active{transform:scale(.88)}
+        .lap-btn:disabled{opacity:.25;cursor:default;transform:none}
+        .lap-display{font-family:var(--fm);font-size:30px;font-weight:800;color:var(--bk);min-width:44px;text-align:center;letter-spacing:-.02em;line-height:1}
+        .lap-display small{font-size:11px;font-weight:500;color:var(--soft);letter-spacing:0}
+        .lap-inf-btn{margin-left:auto}
+        .lap-desc{font-size:11px;color:var(--soft);margin-top:8px;line-height:1.4}
 
         /* ===== クイズ中タイマーHUD ===== */
         .quiz-hud{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px}
@@ -441,24 +458,32 @@
             <div class="stat-cell"><div class="stat-num" id="wrongCount">0</div><div class="stat-label">Wrong</div></div>
             <div class="stat-cell"><div class="stat-num" id="totalCount">0</div><div class="stat-label">Total</div></div>
         </div>
-        <div class="label">Mode</div>
-        <div class="mode-row">
-            <button id="randomModeBtn" class="mode-btn mode-active">🎲 ランダム</button>
-            <button id="sequentialModeBtn" class="mode-btn">📋 順番通り</button>
+
+        <!-- モード設定 -->
+        <div class="setting-card">
+            <div class="setting-card-title">🎯 出題モード</div>
+            <div class="mode-toggle">
+                <button id="randomModeBtn" class="mode-toggle-btn active">🎲 ランダム</button>
+                <button id="sequentialModeBtn" class="mode-toggle-btn">📋 順番通り</button>
+            </div>
         </div>
 
         <!-- タイマー設定 -->
         <div class="setting-card">
             <div class="setting-card-title">⏱️ タイマー</div>
-            <div class="timer-grid">
-                <div class="timer-input-wrap">
-                    <input type="number" id="timerMin" class="timer-input" value="3" min="0" max="99" inputmode="numeric">
-                    <div class="timer-input-label">min</div>
+            <div class="timer-spinner-grid">
+                <div class="timer-spinner">
+                    <button class="timer-spin-btn" data-target="timerMinVal" data-dir="up">▲</button>
+                    <div class="timer-spin-value" id="timerMinVal" data-value="3">3</div>
+                    <button class="timer-spin-btn" data-target="timerMinVal" data-dir="down">▼</button>
+                    <div class="timer-spin-label">min</div>
                 </div>
                 <div class="timer-colon">:</div>
-                <div class="timer-input-wrap">
-                    <input type="number" id="timerSec" class="timer-input" value="00" min="0" max="59" step="5" inputmode="numeric">
-                    <div class="timer-input-label">sec</div>
+                <div class="timer-spinner">
+                    <button class="timer-spin-btn" data-target="timerSecVal" data-dir="up">▲</button>
+                    <div class="timer-spin-value" id="timerSecVal" data-value="0">00</div>
+                    <button class="timer-spin-btn" data-target="timerSecVal" data-dir="down">▼</button>
+                    <div class="timer-spin-label">sec</div>
                 </div>
             </div>
             <div class="timer-presets">
@@ -479,12 +504,12 @@
 
         <!-- 周回（反復）設定 -->
         <div class="setting-card">
-            <div class="setting-card-title">🔄 反復モード <span style="font-size:10px;font-weight:400;color:var(--soft);margin-left:4px">— 間違えた問題を繰り返す</span></div>
+            <div class="setting-card-title">🔄 反復モード<span class="setting-card-sub">— 間違えた問題を繰り返す</span></div>
             <div class="lap-row">
                 <button class="lap-btn" id="lapMinus" disabled>−</button>
                 <div class="lap-display" id="lapDisplay">1<small>周</small></div>
                 <button class="lap-btn" id="lapPlus">+</button>
-                <button class="timer-preset" id="lapInfinite" style="margin-left:auto">∞ 全問正解まで</button>
+                <button class="timer-preset lap-inf-btn" id="lapInfinite">∞ 全問正解まで</button>
             </div>
             <div class="lap-desc" id="lapDesc">1周のみ — 全問を1回通して終了</div>
         </div>
@@ -549,13 +574,13 @@
                 </div>
             </div>
             <div class="stats-detail-section">
-                <div class="stats-detail-section-title">🔥 ニガテ — 伸びしろランキング</div>
+                <div class="stats-detail-section-title">🔥 ニガテ — 伸びしろランキング TOP10</div>
                 <div class="stats-detail-list" id="statsWeakList">
                     <p class="tracker-empty">データなし</p>
                 </div>
             </div>
             <div class="stats-detail-section">
-                <div class="stats-detail-section-title">💪 トクイ — 自信ランキング</div>
+                <div class="stats-detail-section-title">💪 トクイ — 自信ランキング TOP10</div>
                 <div class="stats-detail-list" id="statsStrongList">
                     <p class="tracker-empty">データなし</p>
                 </div>
@@ -667,31 +692,82 @@
 <script>
 /* ===== Timer & Lap Settings UI ===== */
 (function(){
-    /* --- Timer --- */
-    const minEl=document.getElementById('timerMin');
-    const secEl=document.getElementById('timerSec');
+    /* --- Timer Spinner --- */
+    const minValEl=document.getElementById('timerMinVal');
+    const secValEl=document.getElementById('timerSecVal');
     const presets=document.querySelectorAll('.timer-preset[data-time]');
     const autoEndTog=document.getElementById('timerAutoEnd');
 
     function padZ(v){return String(v).padStart(2,'0')}
-    function syncFromInputs(){
-        let m=parseInt(minEl.value)||0, s=parseInt(secEl.value)||0;
-        if(s>59){s=59;secEl.value=padZ(s)}
-        if(m>99){m=99;minEl.value=m}
-        const total=m*60+s;
+
+    function getMin(){return parseInt(minValEl.dataset.value)||0}
+    function getSec(){return parseInt(secValEl.dataset.value)||0}
+    function setMin(v){v=Math.max(0,Math.min(99,v));minValEl.dataset.value=v;minValEl.textContent=v}
+    function setSec(v){v=Math.max(0,Math.min(59,v));secValEl.dataset.value=v;secValEl.textContent=padZ(v)}
+    function syncPresets(){
+        const total=getMin()*60+getSec();
         presets.forEach(p=>p.classList.toggle('active',parseInt(p.dataset.time)===total));
         updateQuizSettings();
     }
-    minEl.addEventListener('input',syncFromInputs);
-    secEl.addEventListener('input',syncFromInputs);
-    minEl.addEventListener('blur',()=>{if(!minEl.value)minEl.value=0});
-    secEl.addEventListener('blur',()=>{secEl.value=padZ(parseInt(secEl.value)||0)});
 
+    // Arrow button clicks
+    document.querySelectorAll('.timer-spin-btn').forEach(btn=>{
+        function step(){
+            const target=document.getElementById(btn.dataset.target);
+            const isMin=target===minValEl;
+            const dir=btn.dataset.dir==='up'?1:-1;
+            if(isMin) setMin(getMin()+dir);
+            else setSec(getSec()+dir*5);
+            syncPresets();
+        }
+        btn.addEventListener('click',step);
+        // Long press repeat
+        let interval=null;
+        btn.addEventListener('pointerdown',()=>{interval=setInterval(step,150)});
+        btn.addEventListener('pointerup',()=>clearInterval(interval));
+        btn.addEventListener('pointerleave',()=>clearInterval(interval));
+    });
+
+    // Drag/scroll on value to change
+    [minValEl,secValEl].forEach(el=>{
+        let startY=0,startVal=0,isMin=el===minValEl;
+        function onMove(e){
+            e.preventDefault();
+            const y=(e.touches?e.touches[0].clientY:e.clientY);
+            const diff=Math.round((startY-y)/18);
+            const step=isMin?1:5;
+            const nv=startVal+diff*step;
+            if(isMin) setMin(nv); else setSec(nv);
+            el.classList.add('dragging');
+            syncPresets();
+        }
+        function onEnd(){
+            document.removeEventListener('pointermove',onMove);
+            document.removeEventListener('pointerup',onEnd);
+            el.classList.remove('dragging');
+        }
+        el.addEventListener('pointerdown',e=>{
+            startY=e.clientY;
+            startVal=parseInt(el.dataset.value)||0;
+            document.addEventListener('pointermove',onMove);
+            document.addEventListener('pointerup',onEnd);
+        });
+        // Mouse wheel
+        el.addEventListener('wheel',e=>{
+            e.preventDefault();
+            const dir=e.deltaY<0?1:-1;
+            const step=isMin?1:5;
+            if(isMin) setMin(getMin()+dir); else setSec(getSec()+dir*step);
+            syncPresets();
+        },{passive:false});
+    });
+
+    // Presets
     presets.forEach(p=>{
         p.addEventListener('click',()=>{
             const t=parseInt(p.dataset.time);
             const m=Math.floor(t/60), s=t%60;
-            minEl.value=m; secEl.value=padZ(s);
+            setMin(m); setSec(s);
             presets.forEach(pp=>pp.classList.remove('active'));
             p.classList.add('active');
             updateQuizSettings();
@@ -718,12 +794,8 @@
             lapMinus.disabled=lapCount<=1;
             lapPlus.disabled=lapCount>=10;
             lapInfBtn.classList.remove('active');
-            const descs={
-                1:'1周のみ — 全問を1回通して終了',
-                2:'間違えた問題だけ2周目に再チャレンジ',
-                3:'最大3周 — 苦手を集中的に潰す！'
-            };
-            lapDesc.textContent=descs[lapCount]||(lapCount+'周まで反復 — 弱点を徹底攻略！');
+            if(lapCount===1) lapDesc.textContent='1周のみ — 全問を1回通して終了';
+            else lapDesc.textContent='最大'+lapCount+'周まで反復 — 間違えた問題を繰り返す';
         }
         updateQuizSettings();
     }
@@ -734,7 +806,7 @@
 
     /* --- Expose to window for app.js --- */
     function updateQuizSettings(){
-        const m=parseInt(minEl.value)||0, s=parseInt(secEl.value)||0;
+        const m=getMin(), s=getSec();
         window.quizSettings=Object.assign(window.quizSettings||{},{
             timerSeconds:m*60+s,
             timerAutoEnd:autoEndTog.checked,
@@ -808,15 +880,21 @@
         try{return JSON.parse(localStorage.getItem('weakTracker'))||{}}catch(e){return{}}
     }
 
+    function resolveName(key){
+        // app.js の getCategoryName を利用（あれば）
+        if(typeof window.getCategoryName==='function') return window.getCategoryName(key);
+        return key;
+    }
+
     function sortByRate(data,ascending){
         return Object.entries(data).map(([key,v])=>{
             const total=(v.correct||0)+(v.wrong||0);
             const rate=total>0?((v.correct||0)/total*100):null;
-            return{key,name:v.name||key,correct:v.correct||0,wrong:v.wrong||0,total,rate};
+            return{key,name:resolveName(key),correct:v.correct||0,wrong:v.wrong||0,total,rate};
         }).filter(d=>d.total>0).sort((a,b)=>{
             if(ascending) return (a.rate??999)-(b.rate??999);
             return (b.rate??-1)-(a.rate??-1);
-        });
+        }).slice(0,10);
     }
 
     function makeTrackerItem(d,type,rank){
