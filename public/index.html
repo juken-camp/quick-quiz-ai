@@ -122,7 +122,7 @@
             justify-content:center;font-family:var(--fm);font-size:11px;font-weight:500;color:var(--mid);flex-shrink:0;transition:all .18s}
         .quiz-opt:hover .quiz-let{background:var(--ac);color:var(--wh)}
         .quiz-res{margin-top:12px;padding:12px 16px;border-radius:12px;font-size:13px;line-height:1.6;font-weight:500;
-            border:1.5px solid var(--ln);background:var(--ft);color:var(--mid);min-height:0;transition:all .3s}
+            border:1.5px solid transparent;background:transparent;color:var(--mid);min-height:0;transition:all .3s}
         .quiz-res.ok{border-color:var(--grn);background:var(--grn-bg);color:#0a6644;
             box-shadow:0 4px 20px rgba(0,201,122,.12)}
         .quiz-res.ng{border-color:var(--red);background:var(--red-bg);color:#9b1625;
@@ -151,6 +151,14 @@
         .ai-bar-send:hover{transform:scale(1.08)}.ai-bar-send:disabled{background:var(--ln);box-shadow:none}
         .ai-bar-icon{background:var(--ft);color:var(--mid);border:1.5px solid var(--ln)}
         .ai-bar-icon:hover{border-color:var(--ac);color:var(--ac);background:var(--ac-bg)}
+
+        /* ===== タイピングインジケーター ===== */
+        .typing{display:flex;gap:4px;align-items:center;height:16px}
+        .typing span{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.4;
+            animation:typingDot 1.2s infinite ease-in-out}
+        .typing span:nth-child(2){animation-delay:.2s}
+        .typing span:nth-child(3){animation-delay:.4s}
+        @keyframes typingDot{0%,80%,100%{opacity:.4;transform:scale(1)}40%{opacity:1;transform:scale(1.2)}}
 
         /* ===== 浮遊メッセージバブル ===== */
         .float-bubble{position:fixed;right:16px;z-index:290;
