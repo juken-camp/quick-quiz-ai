@@ -1,5 +1,5 @@
 /* =============================================================
-   QUIK QUIZ AI — app.js
+   QUICK QUIZ AI — app.js
    ============================================================= */
 
 // ---- Sound ----
@@ -294,12 +294,11 @@ function startQuiz(subj, label) {
     document.getElementById('mainScreen').classList.add('hidden');
     document.getElementById('gameScreen').classList.remove('hidden');
     document.getElementById('currentCategory').textContent = label;
-    document.getElementById('fabRow').classList.add('vis');
     cc = wc = tc = 0; seqIdx = 0; used = []; updateStats();
     // チャット履歴リセット（新しいセッション開始）
     chatHistory = [];
     const box = document.getElementById('chatMs');
-    if (box) box.innerHTML = '';
+    if (box) box.innerHTML = '<div class="chat-m a">何でも質問してね！クイズの解説を深掘りしたり、テストに出やすいポイントを聞いたりできるよ 🎓</div>';
 }
 
 function openQuiz() {
@@ -583,7 +582,6 @@ document.addEventListener('DOMContentLoaded', () => {
         sfx.click(); sel = []; seqIdx = 0; used = [];
         document.getElementById('gameScreen').classList.add('hidden');
         document.getElementById('mainScreen').classList.remove('hidden');
-        document.getElementById('fabRow').classList.remove('vis');
         hideAll();
     });
 
@@ -602,6 +600,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('chatBd').addEventListener('click', () => {
         document.getElementById('chatPn').classList.remove('show');
         document.getElementById('chatBd').classList.remove('show');
+    });
+
+    // ⚙️ 設定ボタン：モードパネル開閉
+    document.getElementById('chatSettingBtn').addEventListener('click', () => {
+        const panel = document.getElementById('modePanel');
+        const btn = document.getElementById('chatSettingBtn');
+        const isOpen = panel.classList.toggle('open');
+        btn.classList.toggle('open', isOpen);
+        btn.textContent = isOpen ? '⚙️ 閉じる' : '⚙️ 設定';
     });
 
     // Chat send
