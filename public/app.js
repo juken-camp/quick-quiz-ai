@@ -194,6 +194,7 @@ function getCategoryName(id) {
     }
     return id;
 }
+window.getCategoryName = getCategoryName;
 function getWeakRate(stat) {
     const total = stat.correct + stat.wrong;
     if (total === 0) return 0;
@@ -418,8 +419,8 @@ function openQuiz() {
 
     let q;
     if (qMode === 'sequential') {
-        if (seqIdx >= lapPool.length) seqIdx = 0;
-        q = lapPool[seqIdx]; seqIdx++;
+        // 順番通り: 常に先頭から取り出す（splice で先頭を除去するので seqIdx 不要）
+        q = lapPool[0];
     } else {
         const av = lapPool.filter(p => !used.includes(p.q));
         if (!av.length) { used = []; q = lapPool[Math.floor(Math.random() * lapPool.length)]; }
@@ -940,13 +941,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('randomModeBtn').addEventListener('click', () => {
         sfx.click(); qMode = 'random';
-        document.getElementById('randomModeBtn').classList.add('mode-active');
-        document.getElementById('sequentialModeBtn').classList.remove('mode-active');
+        document.getElementById('randomModeBtn').classList.add('active');
+        document.getElementById('sequentialModeBtn').classList.remove('active');
     });
     document.getElementById('sequentialModeBtn').addEventListener('click', () => {
         sfx.click(); qMode = 'sequential';
-        document.getElementById('sequentialModeBtn').classList.add('mode-active');
-        document.getElementById('randomModeBtn').classList.remove('mode-active');
+        document.getElementById('sequentialModeBtn').classList.add('active');
+        document.getElementById('randomModeBtn').classList.remove('active');
     });
 
     // 入力欄の変化でsendボタン有効化
